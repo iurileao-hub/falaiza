@@ -1,0 +1,139 @@
+/* Design Tokens - PWA Ouvidoria DF */
+/* Baseado no Design System do Participa DF */
+
+:root {
+  /* Cores Primárias - Participa DF */
+  --color-primary: #192D4B;
+  --color-primary-dark: #0f1c2e;
+  --color-primary-light: #28477D;
+
+  /* Cores de Ação */
+  --color-success: #549250;
+  --color-success-dark: #3d7039;
+  --color-error: #B91C1C;
+  --color-warning: #D97706;
+  --color-info: #0062AE;
+
+  /* Cores Neutras */
+  --color-text: #212529;
+  --color-text-muted: #6B7280;
+  --color-background: #FFFFFF;
+  --color-surface: #F9FAFB;
+  --color-border: #E5E7EB;
+
+  /* Cores GDF */
+  --color-gdf-yellow: #FFC107;
+  --color-gdf-green: #28A745;
+
+  /* Foco e Acessibilidade */
+  --color-focus: #0062AE;
+  --color-focus-ring: rgba(0, 98, 174, 0.5);
+
+  /* Espaçamento */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  /* Tipografia */
+  --font-family: 'Montserrat', 'Muli', sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Transições */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease;
+
+  /* Z-Index */
+  --z-dropdown: 100;
+  --z-modal: 200;
+  --z-toast: 300;
+  --z-skip-link: 400;
+}
+
+/* Alto Contraste */
+[data-high-contrast="true"] {
+  --color-primary: #000000;
+  --color-primary-dark: #000000;
+  --color-primary-light: #333333;
+  --color-text: #FFFFFF;
+  --color-text-muted: #CCCCCC;
+  --color-background: #000000;
+  --color-surface: #1a1a1a;
+  --color-border: #FFFFFF;
+  --color-focus: #FFFF00;
+  --color-focus-ring: rgba(255, 255, 0, 0.5);
+  --color-success: #00FF00;
+  --color-success-dark: #00CC00;
+  --color-error: #FF6666;
+  --color-warning: #FFCC00;
+  --color-info: #00FFFF;
+}
+
+/* Tamanhos de Fonte Aumentados */
+[data-font-size="large"] {
+  --font-size-xs: 0.875rem;
+  --font-size-sm: 1rem;
+  --font-size-base: 1.125rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 1.75rem;
+  --font-size-3xl: 2.25rem;
+}
+
+[data-font-size="larger"] {
+  --font-size-xs: 1rem;
+  --font-size-sm: 1.125rem;
+  --font-size-base: 1.25rem;
+  --font-size-lg: 1.5rem;
+  --font-size-xl: 1.75rem;
+  --font-size-2xl: 2rem;
+  --font-size-3xl: 2.5rem;
+}
+
+/* Reduzir Movimento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+[data-reduced-motion="true"] {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
