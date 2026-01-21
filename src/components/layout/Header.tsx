@@ -72,7 +72,7 @@ export function Header() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="block px-4 py-2 text-sm font-medium hover:bg-white/10 rounded-md transition-colors no-underline text-white"
+                  className="block px-4 py-2 text-sm font-medium hover:bg-white/10 rounded-md transition-colors no-underline text-white hover:text-white"
                 >
                   {item.label}
                 </Link>
@@ -113,7 +113,7 @@ export function Header() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="block px-4 py-3 text-sm font-medium hover:bg-white/10 rounded-md transition-colors no-underline text-white"
+                    className="block px-4 py-3 text-sm font-medium hover:bg-white/10 rounded-md transition-colors no-underline text-white hover:text-white"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.label}

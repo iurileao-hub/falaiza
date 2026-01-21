@@ -118,23 +118,26 @@ export function IdentificacaoForm({
   if (anonimo && permiteAnonimo) {
     return (
       <div className={cn("space-y-4", className)}>
-        <div className="flex items-start gap-3 p-4 bg-info/10 rounded-lg">
+        <label
+          htmlFor="anonimo"
+          className="flex items-center gap-4 p-4 bg-info/10 rounded-lg border-2 border-info cursor-pointer"
+        >
           <Checkbox
             id="anonimo"
             checked={anonimo}
             onCheckedChange={(checked) => onAnonimoChange(checked === true)}
-            className="mt-0.5"
+            className="h-6 w-6"
           />
           <div className="flex-1">
-            <Label htmlFor="anonimo" className="font-medium cursor-pointer">
+            <span className="font-medium block">
               Enviar de forma anônima
-            </Label>
+            </span>
             <p className="text-sm text-muted mt-1">
               Sua manifestação será registrada sem identificação. Você não
               receberá atualizações sobre o andamento.
             </p>
           </div>
-        </div>
+        </label>
       </div>
     );
   }
@@ -143,22 +146,30 @@ export function IdentificacaoForm({
     <div className={cn("space-y-6", className)}>
       {/* Opção de anonimato */}
       {permiteAnonimo && (
-        <div className="flex items-start gap-3 p-4 bg-surface rounded-lg border">
+        <label
+          htmlFor="anonimo"
+          className={cn(
+            "flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all",
+            anonimo
+              ? "bg-info/10 border-info"
+              : "bg-surface border-border hover:border-primary/50"
+          )}
+        >
           <Checkbox
             id="anonimo"
             checked={anonimo}
             onCheckedChange={(checked) => onAnonimoChange(checked === true)}
-            className="mt-0.5"
+            className="h-6 w-6"
           />
           <div className="flex-1">
-            <Label htmlFor="anonimo" className="font-medium cursor-pointer">
+            <span className="font-medium block">
               Enviar de forma anônima
-            </Label>
-            <p className="text-sm text-muted mt-1">
+            </span>
+            <span className="text-sm text-muted mt-1 block">
               Marque esta opção se não deseja se identificar.
-            </p>
+            </span>
           </div>
-        </div>
+        </label>
       )}
 
       {/* Campos de identificação */}

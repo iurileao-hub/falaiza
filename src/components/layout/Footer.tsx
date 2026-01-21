@@ -24,8 +24,8 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  href="/manifestacao/tipo"
-                  className="opacity-80 hover:opacity-100 transition-opacity no-underline text-white flex items-center gap-2"
+                  href="/manifestacao/tipo?nova=true"
+                  className="opacity-80 hover:opacity-100 transition-opacity no-underline text-white hover:text-white flex items-center gap-2"
                 >
                   Nova Manifestação
                 </Link>
@@ -33,7 +33,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/acompanhar"
-                  className="opacity-80 hover:opacity-100 transition-opacity no-underline text-white flex items-center gap-2"
+                  className="opacity-80 hover:opacity-100 transition-opacity no-underline text-white hover:text-white flex items-center gap-2"
                 >
                   Acompanhar Protocolo
                 </Link>
@@ -41,7 +41,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/perguntas-frequentes"
-                  className="opacity-80 hover:opacity-100 transition-opacity no-underline text-white flex items-center gap-2"
+                  className="opacity-80 hover:opacity-100 transition-opacity no-underline text-white hover:text-white flex items-center gap-2"
                 >
                   Perguntas Frequentes
                 </Link>
@@ -51,7 +51,7 @@ export function Footer() {
                   href="https://www.participa.df.gov.br"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="opacity-80 hover:opacity-100 transition-opacity no-underline text-white flex items-center gap-2"
+                  className="opacity-80 hover:opacity-100 transition-opacity no-underline text-white hover:text-white flex items-center gap-2"
                 >
                   Site Oficial
                   <ExternalLink className="h-3 w-3" />
@@ -114,13 +114,13 @@ export function Footer() {
             <div className="flex items-center gap-4">
               <Link
                 href="/privacidade"
-                className="hover:opacity-100 no-underline text-white"
+                className="hover:opacity-100 no-underline text-white hover:text-white"
               >
                 Política de Privacidade
               </Link>
               <Link
                 href="/termos"
-                className="hover:opacity-100 no-underline text-white"
+                className="hover:opacity-100 no-underline text-white hover:text-white"
               >
                 Termos de Uso
               </Link>

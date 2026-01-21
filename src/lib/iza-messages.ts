@@ -60,7 +60,7 @@ export const MENSAGENS_IZA = {
    * Boas-vindas e início do fluxo
    */
   boasVindas: {
-    inicial: "Olá! Sou a IZA, assistente virtual da Ouvidoria do Distrito Federal. Como posso te ajudar hoje?",
+    inicial: "Olá! Sou a IZA, assistente virtual da Ouvidoria do Distrito Federal. Vou te ajudar a registrar sua manifestação de forma simples e rápida. Para começar, escolha abaixo o tipo de manifestação que você deseja fazer:",
     retorno: "Que bom te ver de volta! Vamos continuar de onde paramos?",
     rascunhoRecuperado: "Encontrei um rascunho salvo. Quer continuar essa manifestação?",
   },

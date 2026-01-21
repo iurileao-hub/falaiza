@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { WizardLayout } from "@/components/wizard/WizardLayout";
 import { StepCard } from "@/components/wizard/StepCard";
 import { NavigationButtons } from "@/components/wizard/NavigationButtons";
@@ -12,10 +13,23 @@ import { TipoManifestacao } from "@/types/manifestacao";
 
 export default function TipoPage() {
   const router = useRouter();
-  const { manifestacao, setTipo, podeAvancar, etapaAtual, irParaEtapa } =
+  const searchParams = useSearchParams();
+  const { manifestacao, setTipo, podeAvancar, etapaAtual, irParaEtapa, resetar } =
     useManifestacaoStore();
+  const [pronto, setPronto] = useState(false);
 
-  const tipoSelecionado = manifestacao.tipo;
+  // Reseta o estado se vier de uma nova manifestação (não de navegação interna)
+  useEffect(() => {
+    const isNova = searchParams.get("nova") === "true";
+    if (isNova) {
+      resetar();
+      // Remove o parâmetro da URL sem recarregar
+      router.replace("/manifestacao/tipo", { scroll: false });
+    }
+    setPronto(true);
+  }, [searchParams, resetar, router]);
+
+  const tipoSelecionado = pronto ? manifestacao.tipo : null;
 
   const handleSelectTipo = (tipo: TipoManifestacao) => {
     setTipo(tipo);
@@ -35,9 +49,9 @@ export default function TipoPage() {
         mensagem={
           tipoSelecionado
             ? MENSAGENS_IZA.tipo.selecao(tipoSelecionado)
-            : MENSAGENS_IZA.tipo.inicial
+            : MENSAGENS_IZA.boasVindas.inicial
         }
-        variante="default"
+        variante={tipoSelecionado ? "default" : "acenando"}
       />
 
       {/* Seleção de Tipo */}

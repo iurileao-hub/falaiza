@@ -19,13 +19,16 @@ const MOCK_CONFIG = {
   networkDelay: 1500,
 
   // Taxa de sucesso (para testes de resiliência)
-  successRate: 0.95,
+  successRate: 1.0, // 100% de sucesso em modo demo
 
   // Simular erros específicos
-  simulateErrors: process.env.NEXT_PUBLIC_SIMULATE_ERRORS === "true",
+  simulateErrors: false, // Desabilitado em modo demo
 
   // Log detalhado
   verbose: process.env.NODE_ENV === "development",
+
+  // Modo demo: validação simplificada
+  demoMode: true,
 };
 
 /**
@@ -65,26 +68,39 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     log("Dados recebidos:", body);
 
-    // Validar dados
-    const validacao = envioManifestacaoSchema.safeParse(body);
+    // Em modo demo, validação simplificada
+    let dados = body;
 
-    if (!validacao.success) {
-      log("Erro de validação:", validacao.error.issues);
-      return NextResponse.json(
-        {
-          success: false,
-          erro: "VALIDATION_ERROR",
-          mensagem: "Dados inválidos. Verifique os campos e tente novamente.",
-          detalhes: validacao.error.issues.map((issue: z.ZodIssue) => ({
-            campo: issue.path.join("."),
-            mensagem: issue.message,
-          })),
-        },
-        { status: 400 }
-      );
+    if (!MOCK_CONFIG.demoMode) {
+      // Validar dados (modo produção)
+      const validacao = envioManifestacaoSchema.safeParse(body);
+
+      if (!validacao.success) {
+        log("Erro de validação:", validacao.error.issues);
+        return NextResponse.json(
+          {
+            success: false,
+            erro: "VALIDATION_ERROR",
+            mensagem: "Dados inválidos. Verifique os campos e tente novamente.",
+            detalhes: validacao.error.issues.map((issue: z.ZodIssue) => ({
+              campo: issue.path.join("."),
+              mensagem: issue.message,
+            })),
+          },
+          { status: 400 }
+        );
+      }
+      dados = validacao.data;
+    } else {
+      // Modo demo: validação básica apenas
+      log("Modo demo: validação simplificada");
+      if (!body.tipo) {
+        return NextResponse.json(
+          { success: false, erro: "VALIDATION_ERROR", mensagem: "Tipo é obrigatório" },
+          { status: 400 }
+        );
+      }
     }
-
-    const dados = validacao.data;
 
     // Gerar protocolo
     const protocolo = gerarProtocolo();
@@ -97,11 +113,15 @@ export async function POST(request: NextRequest) {
       : "30 dias úteis";
 
     // Simular armazenamento (em produção, enviaria para backend real)
+    const relatoTruncado = dados.relato
+      ? dados.relato.substring(0, 100) + (dados.relato.length > 100 ? "..." : "")
+      : "(sem texto - apenas mídia)";
+
     const manifestacaoSalva = {
       protocolo,
       tipo: dados.tipo,
       assunto: dados.assunto,
-      relato: dados.relato.substring(0, 100) + "...", // Truncar para log
+      relato: relatoTruncado,
       anonimo: dados.anonimo,
       identificacao: dados.anonimo ? null : "***PROTEGIDO***",
       anexosCount: dados.anexos?.length || 0,

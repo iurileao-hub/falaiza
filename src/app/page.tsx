@@ -116,7 +116,7 @@ export default function HomePage() {
             <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
               {/* Card Ouvidoria */}
               <Link
-                href="/manifestacao/tipo"
+                href="/manifestacao/tipo?nova=true"
                 className="selection-card group no-underline text-foreground"
               >
                 <div className="text-6xl mb-4">🗣️</div>
@@ -196,7 +196,7 @@ export default function HomePage() {
                     href="https://www.participa.df.gov.br"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:opacity-100 no-underline text-white"
+                    className="hover:opacity-100 no-underline text-white hover:text-white"
                   >
                     Site Oficial
                   </a>
@@ -206,7 +206,7 @@ export default function HomePage() {
                     href="https://www.df.gov.br"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:opacity-100 no-underline text-white"
+                    className="hover:opacity-100 no-underline text-white hover:text-white"
                   >
                     GDF
                   </a>

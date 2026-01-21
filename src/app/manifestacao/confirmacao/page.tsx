@@ -73,14 +73,14 @@ export default function ConfirmacaoPage() {
       const dadosEnvio = {
         tipo: manifestacao.tipo,
         assunto: manifestacao.assunto,
-        relato: manifestacao.relato,
-        anonimo: manifestacao.anonimo,
+        relato: manifestacao.relato || "", // Garante string vazia se undefined
+        anonimo: manifestacao.anonimo ?? false,
         identificacao: manifestacao.anonimo ? null : manifestacao.identificacao,
         anexos: anexos.map((a) => ({
           nome: a.nome,
           tipo: a.tipo,
           tamanho: a.tamanho,
-          gravadoNativo: a.gravadoNativo,
+          gravadoNativo: a.gravadoNativo ?? false,
         })),
       };
 
@@ -136,7 +136,7 @@ export default function ConfirmacaoPage() {
   // Nova manifestação
   const handleNovaManifestaçao = () => {
     resetar();
-    router.push("/manifestacao/tipo");
+    router.push("/manifestacao/tipo?nova=true");
   };
 
   // Voltar

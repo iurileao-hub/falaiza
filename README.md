@@ -195,6 +195,11 @@ npm start
 6. **Identificação**: Informe seus dados ou envie anonimamente
 7. **Confirmação**: Revise e receba seu protocolo
 
+### Páginas Adicionais
+
+- **Acompanhar Protocolo** (`/acompanhar`): Consulte o status de sua manifestação pelo número do protocolo
+- **Perguntas Frequentes** (`/perguntas-frequentes`): FAQ com busca e categorias sobre a Ouvidoria
+
 ### Atalhos de Teclado
 
 | Atalho | Ação |
@@ -278,6 +283,8 @@ hackathon-ouvidoria-df/
 │   │   ├── globals.css       # Estilos globais
 │   │   ├── sw.ts             # Service Worker
 │   │   ├── offline/          # Página offline
+│   │   ├── acompanhar/       # Consulta de protocolo
+│   │   ├── perguntas-frequentes/ # FAQ
 │   │   ├── manifestacao/     # Wizard de manifestação
 │   │   │   ├── tipo/
 │   │   │   ├── assunto/
@@ -286,7 +293,7 @@ hackathon-ouvidoria-df/
 │   │   │   ├── identificacao/
 │   │   │   └── confirmacao/
 │   │   └── api/
-│   │       └── manifestacao/ # API route
+│   │       └── manifestacao/ # API route (modo demo)
 │   │
 │   ├── components/
 │   │   ├── ui/               # shadcn/ui

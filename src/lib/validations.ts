@@ -56,14 +56,10 @@ export const assuntoSchema = z.object({
 });
 
 /**
- * Schema de Relato
+ * Schema de Relato (pode ser vazio se tiver anexos)
  */
 export const relatoSchema = z
   .string()
-  .min(
-    VALIDACOES.relato.minCaracteres,
-    `Relato deve ter pelo menos ${VALIDACOES.relato.minCaracteres} caracteres`
-  )
   .max(
     VALIDACOES.relato.maxCaracteres,
     `Relato deve ter no máximo ${VALIDACOES.relato.maxCaracteres} caracteres`
@@ -75,9 +71,10 @@ export const relatoSchema = z
 export const anexoSchema = z.object({
   tipo: z.enum(["audio", "video", "foto", "documento"]),
   nome: z.string().min(1),
-  mimeType: z.string().min(1),
   tamanho: z.number().positive(),
+  mimeType: z.string().optional(),
   duracao: z.number().optional(),
+  gravadoNativo: z.boolean().optional(),
 });
 
 /**
@@ -130,6 +127,17 @@ export const envioManifestacaoSchema = manifestacaoBaseSchema.extend({
   {
     message: "Identificação é obrigatória quando não for anônimo",
     path: ["identificacao"],
+  }
+).refine(
+  (data) => {
+    // Precisa ter relato com pelo menos 20 caracteres OU ter anexos
+    const temRelato = data.relato && data.relato.length >= VALIDACOES.relato.minCaracteres;
+    const temAnexos = data.anexos && data.anexos.length > 0;
+    return temRelato || temAnexos;
+  },
+  {
+    message: "Escreva um relato com pelo menos 20 caracteres ou adicione um anexo",
+    path: ["relato"],
   }
 );
 
