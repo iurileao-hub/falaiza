@@ -19,6 +19,11 @@ Desenvolver uma PWA acessível e inovadora para registro de manifestações cida
 4. **100% Offline** - PWA funcional sem conexão
 5. **Acessibilidade Nativa** - WCAG 2.1 AA sem depender de plugins
 6. **Identidade Visual Integrada** - Visual alinhado ao Participa DF existente
+7. **IZA Inteligente com Privacidade** - Classificação automática de manifestações por IA
+   - 3 camadas: Regras → Modelo Local → Backend GDF
+   - Dados nunca saem do dispositivo (camadas 1 e 2)
+   - Conformidade total com LGPD
+   - Reduz tempo de registro de ~5 para ~3 minutos
 
 ---
 
@@ -34,6 +39,7 @@ Desenvolver uma PWA acessível e inovadora para registro de manifestações cida
 | Validação | Zod | Type-safe, integra com forms |
 | Testes A11y | axe-core + jest-axe | Automação de testes WCAG |
 | PWA | next-pwa | Service Worker automático |
+| IA Local | Transformers.js | Modelos ONNX no browser, privacidade total |
 
 ---
 
@@ -69,18 +75,16 @@ hackathon-ouvidoria-df/
 │   │   ├── manifestacao/
 │   │   │   ├── layout.tsx
 │   │   │   ├── page.tsx
-│   │   │   ├── tipo/
-│   │   │   │   └── page.tsx
-│   │   │   ├── assunto/
-│   │   │   │   └── page.tsx
 │   │   │   ├── relato/
-│   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx        # Etapa 1: Relato (texto + mídia)
+│   │   │   ├── sugestao/
+│   │   │   │   └── page.tsx        # Etapa 2: Sugestão IA (NOVA)
 │   │   │   ├── anexos/
-│   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx        # Etapa 3: Anexos adicionais
 │   │   │   ├── identificacao/
-│   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx        # Etapa 4: Dados pessoais
 │   │   │   └── confirmacao/
-│   │   │       └── page.tsx
+│   │   │       └── page.tsx        # Etapa 5: Protocolo
 │   │   │
 │   │   └── api/
 │   │       ├── manifestacao/
@@ -111,7 +115,14 @@ hackathon-ouvidoria-df/
 │   │   ├── iza/
 │   │   │   ├── IzaAvatar.tsx
 │   │   │   ├── IzaMessage.tsx
-│   │   │   └── IzaContainer.tsx
+│   │   │   ├── IzaContainer.tsx
+│   │   │   ├── IzaCarregando.tsx
+│   │   │   ├── IzaSugestaoInteligente.tsx
+│   │   │   ├── SeletorComConfianca.tsx
+│   │   │   ├── ConfiancaIndicator.tsx
+│   │   │   ├── PrivacidadeIndicator.tsx
+│   │   │   ├── ConsentimentoIA.tsx
+│   │   │   └── IzaModelDownload.tsx
 │   │   │
 │   │   ├── wizard/
 │   │   │   ├── WizardLayout.tsx
@@ -153,14 +164,22 @@ hackathon-ouvidoria-df/
 │   │   ├── useIndexedDB.ts
 │   │   ├── useOffline.ts
 │   │   ├── useAccessibility.ts
-│   │   └── useKeyboardNavigation.ts
+│   │   ├── useKeyboardNavigation.ts
+│   │   ├── useClassificacao.ts
+│   │   └── useModeloLocal.ts
 │   │
 │   ├── lib/
 │   │   ├── db.ts
 │   │   ├── protocolo.ts
 │   │   ├── validations.ts
 │   │   ├── constants.ts
-│   │   └── utils.ts
+│   │   ├── utils.ts
+│   │   └── iza/
+│   │       ├── engine.ts
+│   │       ├── rules-engine.ts
+│   │       ├── local-model.ts
+│   │       ├── keywords.ts
+│   │       └── types.ts
 │   │
 │   ├── stores/
 │   │   ├── manifestacaoStore.ts
@@ -316,16 +335,38 @@ Disabled:  bg-surface, text-muted, cursor-not-allowed
 
 ## Fluxo do Wizard
 
-### Etapas
+### Mudança de Paradigma com IZA Inteligente
+
+O fluxo foi redesenhado para ser mais natural e inteligente:
+
+```
+FLUXO ORIGINAL (6 etapas manuais):
+Tipo → Assunto → Relato → Anexos → Identificação → Confirmação
+ ↓        ↓
+Manual  Manual
+
+FLUXO COM IZA INTELIGENTE (5 etapas, classificação automática):
+Relato → Sugestão IA → Anexos → Identificação → Confirmação
+  ↓           ↓
+Texto/    Automático
+Mídia     (editável)
+```
+
+**Benefícios:**
+- Cidadão começa contando o problema (mais natural)
+- IA classifica tipo e órgão automaticamente
+- Reduz carga cognitiva (menos decisões manuais)
+- Tempo de registro: ~5min → ~3min
+
+### Etapas (Novo Fluxo)
 
 | # | Rota | Componente Principal | Validação |
 |---|------|---------------------|-----------|
-| 1 | `/manifestacao/tipo` | StepCard (6 opções) | Seleção obrigatória |
-| 2 | `/manifestacao/assunto` | AssuntoSearch | Categoria obrigatória |
-| 3 | `/manifestacao/relato` | RelatoTextarea + MediaToolbar | Mín. 20 chars OU 1 mídia |
-| 4 | `/manifestacao/anexos` | MediaList + MediaToolbar | Opcional (máx 25MB) |
-| 5 | `/manifestacao/identificacao` | IdentificacaoForm | Condicional por tipo |
-| 6 | `/manifestacao/confirmacao` | Resumo + Protocolo | Revisão final |
+| 1 | `/manifestacao/relato` | RelatoTextarea + MediaToolbar | Mín. 20 chars OU 1 mídia |
+| 2 | `/manifestacao/sugestao` | IzaSugestaoInteligente | Tipo e órgão confirmados |
+| 3 | `/manifestacao/anexos` | MediaList + MediaToolbar | Opcional (máx 25MB) |
+| 4 | `/manifestacao/identificacao` | IdentificacaoForm | Condicional por tipo |
+| 5 | `/manifestacao/confirmacao` | Resumo + Protocolo | Revisão final |
 
 ### Regras de Navegação
 
@@ -334,12 +375,11 @@ const REGRAS_NAVEGACAO = {
   // Pode avançar se:
   podeAvancar: (etapa: number, dados: Manifestacao) => {
     switch (etapa) {
-      case 1: return !!dados.tipo;
-      case 2: return !!dados.assunto?.categoria;
-      case 3: return dados.relato?.length >= 20 || dados.anexos?.length > 0;
-      case 4: return true; // Anexos opcionais
-      case 5: return dados.anonimo || validarIdentificacao(dados.identificacao);
-      case 6: return true; // Confirmação
+      case 1: return dados.relato?.length >= 20 || dados.midias?.length > 0;
+      case 2: return !!dados.classificacao?.tipo && !!dados.classificacao?.orgao;
+      case 3: return true; // Anexos opcionais
+      case 4: return dados.anonimo || validarIdentificacao(dados.identificacao);
+      case 5: return true; // Confirmação
     }
   },
 
@@ -762,8 +802,267 @@ const MENSAGENS_IZA = {
   ajuda: {
     central162: "Se você não conseguir fazer o registro, ligue na Central 162.",
   },
+
+  // Mensagens da IZA Inteligente (NOVAS)
+  ia: {
+    analisando: "Analisando seu relato...",
+    altaConfianca: (tipo: string) =>
+      `Entendi! Parece que você quer fazer ${artigoTipo(tipo)} ${tipo}. Confirma pra mim se está certo:`,
+    mediaConfianca:
+      "Acho que entendi, mas quero confirmar com você. É isso mesmo?",
+    baixaConfianca:
+      "Não consegui identificar bem o tipo. Você pode me ajudar escolhendo abaixo?",
+    semModelo:
+      "Identifiquei algumas informações no seu relato. Confere se está certo:",
+    usuarioEditou:
+      "Perfeito! Atualizei com as suas correções.",
+    confirmado:
+      "Ótimo! Vamos continuar com o registro.",
+  },
 };
 ```
+
+---
+
+## IZA Inteligente - Arquitetura de Privacidade
+
+### Visão Geral
+
+A IZA Inteligente usa IA para classificar automaticamente manifestações, extrair entidades e gerar resumos. A arquitetura foi projetada com **privacidade como prioridade**, garantindo que os dados do cidadão sejam protegidos.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    DISPOSITIVO DO CIDADÃO                       │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │                      PWA Ouvidoria                        │  │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐   │  │
+│  │  │   Relato    │→ │ IZA Engine  │→ │   Sugestões     │   │  │
+│  │  │  (texto)    │  │  (local)    │  │  (tipo, órgão)  │   │  │
+│  │  └─────────────┘  └──────┬──────┘  └─────────────────┘   │  │
+│  │                          │                                │  │
+│  │         ┌────────────────┼────────────────┐              │  │
+│  │         ▼                ▼                ▼              │  │
+│  │  ┌──────────┐    ┌──────────────┐   ┌──────────┐        │  │
+│  │  │ Camada 1 │    │   Camada 2   │   │ Camada 3 │        │  │
+│  │  │  Regras  │    │ Modelo Local │   │ Backend  │        │  │
+│  │  │  (0 KB)  │    │  (~50-80MB)  │   │   GDF    │        │  │
+│  │  └──────────┘    └──────────────┘   └────┬─────┘        │  │
+│  │       ✓               ✓ opcional         │ futuro       │  │
+│  └───────────────────────────────────────────┼───────────────┘  │
+│                 DADOS NUNCA SAEM             │                  │
+│                 (exceto envio final)         │                  │
+└─────────────────────────────────────────────────────────────────┘
+                                               │
+                                               ▼ (apenas Camada 3)
+                              ┌────────────────────────────────┐
+                              │     INFRAESTRUTURA GDF         │
+                              │  (servidores públicos, LGPD)   │
+                              └────────────────────────────────┘
+```
+
+### Princípio Fundamental
+
+**Os dados do cidadão NUNCA são enviados para serviços externos de IA.**
+
+A análise acontece:
+- **Localmente no dispositivo** (Camadas 1 e 2), ou
+- **Em servidores do próprio GDF** (Camada 3), sob LGPD
+
+### Camada 1: Sistema de Regras (Sempre Disponível)
+
+Classificação instantânea, offline, sem download adicional. Funciona em **qualquer dispositivo**.
+
+```typescript
+// lib/iza/rules-engine.ts
+
+interface ClassificacaoResultado {
+  tipo: { id: string; confianca: number };
+  orgao: { id: string; confianca: number };
+  entidades: {
+    locais: string[];
+    datas: string[];
+    orgaosMencionados: string[];
+  };
+  resumo: string;
+}
+
+// Mapa de palavras-chave → classificação
+const REGRAS_TIPO = {
+  reclamacao: {
+    peso: 1.0,
+    palavras: ['reclamação', 'reclamar', 'péssimo', 'horrível', 'demora',
+               'não funciona', 'quebrado', 'falta de', 'descaso', 'absurdo'],
+    frases: ['esperei muito', 'não resolveram', 'ninguém atende']
+  },
+  denuncia: {
+    peso: 1.2,
+    palavras: ['denúncia', 'denunciar', 'corrupção', 'irregularidade',
+               'desvio', 'fraude', 'ilegal', 'propina', 'assédio'],
+    frases: ['vi funcionário', 'presenciei', 'tenho provas']
+  },
+  // ... elogio, sugestao, solicitacao, informacao
+};
+
+const REGRAS_ORGAO = {
+  saude: {
+    palavras: ['hospital', 'upa', 'posto de saúde', 'médico', 'enfermeiro',
+               'remédio', 'medicamento', 'vacina', 'exame', 'cirurgia'],
+    entidades: ['HRT', 'HRG', 'HRAN', 'UPA', 'UBS']
+  },
+  educacao: {
+    palavras: ['escola', 'professor', 'aluno', 'matrícula', 'creche',
+               'merenda', 'uniforme', 'transporte escolar'],
+    entidades: ['CEF', 'CED', 'EC', 'CEI']
+  },
+  // ... transporte, seguranca, obras, saneamento, etc.
+};
+
+// Extração de entidades via Regex
+const EXTRATORES = {
+  locais: /\b(Taguatinga|Ceilândia|Samambaia|Plano Piloto|Águas Claras|...)\b/gi,
+  datas: /\b(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}|ontem|hoje|semana passada)\b/gi,
+  orgaos: /\b(Hospital Regional de \w+|UPA \w+|Escola \w+|DETRAN|CAESB|CEB)\b/gi
+};
+```
+
+**Performance:**
+| Métrica | Valor |
+|---------|-------|
+| Tempo de classificação | < 50ms |
+| Tamanho adicional | 0 KB |
+| Precisão estimada | ~70-80% |
+| Funciona offline | ✅ Sim |
+
+### Camada 2: Modelo Local (Opcional, ~50-80MB)
+
+Melhora precisão quando o usuário opta por baixar. **Dados continuam 100% no dispositivo.**
+
+```typescript
+// lib/iza/local-model.ts
+import { pipeline, env } from '@xenova/transformers';
+
+class IzaLocalModel {
+  private embedder: any = null;
+
+  async inicializar(onProgress?: (p: number) => void): Promise<void> {
+    this.embedder = await pipeline(
+      'feature-extraction',
+      'Xenova/multilingual-e5-small',
+      { progress_callback: onProgress, quantized: true }
+    );
+    await this.computarExemplos();
+  }
+
+  async classificar(relato: string): Promise<ClassificacaoResultado> {
+    const embedding = await this.gerarEmbedding(relato);
+    // Classificação por similaridade com exemplos pré-definidos
+    return this.encontrarMaisSimilar(embedding);
+  }
+}
+```
+
+**Performance:**
+| Métrica | Valor |
+|---------|-------|
+| Download inicial | ~50MB (uma vez) |
+| Tempo de classificação | ~200-500ms |
+| Precisão estimada | ~85-90% |
+| Funciona offline | ✅ Sim (após download) |
+
+### Camada 3: Backend GDF (Documentação para Implementação Futura)
+
+Para casos onde maior precisão é necessária, documentamos a integração com infraestrutura do GDF.
+
+```typescript
+// Especificação da API (implementação futura pelo GDF)
+
+/**
+ * POST /api/ia/classificar
+ * Dados processados e descartados - não persistidos.
+ */
+interface ClassificarRequest {
+  relato: string;
+  privacidade: {
+    consentimento: true;
+    naoArmazenar: true;
+  };
+}
+
+interface ClassificarResponse {
+  tipo: { id: string; confianca: number };
+  orgao: { id: string; confianca: number };
+  entidades: { locais: string[]; datas: string[] };
+  resumo: { curto: string; medio: string };
+  meta: {
+    dadosDescartados: true;  // Confirmação LGPD
+  };
+}
+```
+
+**Requisitos de Segurança:**
+- Isolamento de rede (serviço interno)
+- TLS 1.3 obrigatório
+- Dados descartados após processamento
+- Logs anonimizados
+- Consentimento explícito do usuário
+
+### Matriz de Privacidade
+
+| Aspecto | Camada 1 (Regras) | Camada 2 (Local) | Camada 3 (GDF) |
+|---------|-------------------|------------------|----------------|
+| Dados saem do device? | NÃO | NÃO | SIM (só p/ GDF) |
+| Dados persistidos? | NÃO | NÃO | NÃO |
+| Terceiros envolvidos? | NÃO | NÃO | NÃO |
+| Consentimento | Implícito | Explícito | Explícito |
+| Risco LGPD | ZERO | ZERO | BAIXO |
+
+### Fluxo de Consentimento
+
+```typescript
+// components/iza/ConsentimentoIA.tsx
+
+function ConsentimentoIA({ camada, onAceitar, onRecusar }) {
+  return (
+    <Card>
+      <IzaMessage>
+        {camada === 'modelo_local'
+          ? "Quer que eu entenda melhor seu relato? Posso baixar um modelo de IA que funciona direto no seu celular."
+          : "Para uma análise mais precisa, posso enviar seu relato para o servidor seguro da Ouvidoria do GDF."
+        }
+      </IzaMessage>
+
+      <PrivacidadeInfo>
+        {camada === 'modelo_local' ? (
+          <>
+            ✓ Seus dados NUNCA saem do seu celular
+            ✓ Funciona mesmo sem internet
+            ✓ Tamanho: ~50 MB (download único)
+          </>
+        ) : (
+          <>
+            ✓ Dados enviados apenas para servidores do GDF
+            ✓ Processamento instantâneo, sem armazenamento
+            ✓ Protegido pela LGPD
+          </>
+        )}
+      </PrivacidadeInfo>
+
+      <Button onClick={onAceitar}>Aceitar</Button>
+      <Button variant="ghost" onClick={onRecusar}>Não, obrigado</Button>
+    </Card>
+  );
+}
+```
+
+### Política de Privacidade (Resumo)
+
+1. **Processamento Local (Padrão):** Dados nunca saem do dispositivo
+2. **Servidor GDF (Opcional):** Dados apenas para servidores públicos, descartados após uso
+3. **O que NÃO fazemos:**
+   - ❌ Não usamos APIs de IA comerciais (OpenAI, Google, etc.)
+   - ❌ Não vendemos ou compartilhamos dados
+   - ❌ Não armazenamos relatos para treinar modelos
+4. **Direitos LGPD:** Acesso, exclusão, revogação de consentimento
 
 ---
 
@@ -790,11 +1089,11 @@ const MENSAGENS_IZA = {
 2. IzaMessage (balão)
 3. IzaContainer (composição)
 
-### Fase 4: Etapas 1-2 (2h)
-1. Página tipo (cards de seleção)
-2. Página assunto (busca + chips)
-3. Navegação entre etapas
-4. Validações
+### Fase 4: Etapa 1 - Relato (2h)
+1. Página relato (textarea + media toolbar)
+2. Integração com captura de mídia
+3. Validação (mín 20 chars OU mídia)
+4. Auto-save do rascunho
 
 ### Fase 5: Captura de Mídia (3h)
 1. useMediaRecorder hook
@@ -804,16 +1103,20 @@ const MENSAGENS_IZA = {
 5. FileUploader
 6. MediaList + preview
 
-### Fase 6: Etapa 3-4 (2h)
-1. Página relato (textarea + media toolbar)
-2. Página anexos (lista + upload)
-3. Contador de tamanho
-4. Validações
+### Fase 6: IZA Inteligente (3h) - NOVA
+1. Engine de classificação por regras (rules-engine.ts)
+2. Mapeamento de palavras-chave (tipos + órgãos)
+3. Extração de entidades (regex para locais, datas)
+4. Componentes de sugestão (IzaSugestaoInteligente, SeletorComConfianca)
+5. Integração Transformers.js (modelo local opcional)
+6. Tela de consentimento e download do modelo
+7. Indicadores de privacidade e confiança
+8. Página /manifestacao/sugestao
 
-### Fase 7: Etapa 5-6 (2h)
-1. Página identificação (form + toggle anônimo)
-2. Página confirmação (resumo)
-3. Geração de protocolo
+### Fase 7: Etapas 3-5 (2h)
+1. Página anexos (lista + upload adicional)
+2. Página identificação (form + toggle anônimo)
+3. Página confirmação (resumo + protocolo)
 4. Tela de sucesso
 
 ### Fase 8: Persistência (2h)
@@ -855,12 +1158,14 @@ const MENSAGENS_IZA = {
 
 | Fase | Descrição | Tempo |
 |------|-----------|-------|
-| 1-3 | Setup + Layout + IZA | 5h |
-| 4-7 | Todas as etapas | 9h |
+| 1-3 | Setup + Layout + IZA visual | 5h |
+| 4-5 | Relato + Captura de Mídia | 5h |
+| 6 | **IZA Inteligente (NOVA)** | 3h |
+| 7 | Etapas 3-5 (anexos, id, confirmação) | 2h |
 | 8-9 | Persistência + PWA | 4h |
 | 10-11 | Acessibilidade + Testes | 4h |
 | 12 | Documentação + Vídeo | 1h |
-| **Total** | | **~23h** |
+| **Total** | | **~24h** |
 
 ---
 
@@ -872,8 +1177,17 @@ const MENSAGENS_IZA = {
 |----------|------|--------------|
 | Acessibilidade WCAG 2.1 AA (2.5) | 2.5/2.5 | Checklist completo + Lighthouse ≥95 |
 | Multicanalidade (3.0) | 3.0/3.0 | Texto + áudio + vídeo + foto simultâneos |
-| UX/UI (3.0) | 3.0/3.0 | Wizard conversacional + IZA + visual Participa DF |
-| Integração Participa DF (1.5) | 1.5/1.5 | Cores, fontes, IZA, fluxo idêntico |
+| UX/UI (3.0) | 3.0/3.0 | Wizard conversacional + IZA Inteligente + visual Participa DF |
+| Integração Participa DF (1.5) | 1.5/1.5 | Cores, fontes, IZA, fluxo otimizado |
+
+### Diferencial Competitivo: IZA Inteligente
+
+| Funcionalidade | Benefício | Implementação |
+|----------------|-----------|---------------|
+| Classificação automática | Menos cliques, mais natural | Regras + Modelo Local |
+| Extração de entidades | Formulário pré-preenchido | Regex + NLP |
+| Privacidade by design | Dados no dispositivo | Camadas 1 e 2 locais |
+| LGPD compliance | Confiança do cidadão | Consentimento explícito |
 
 ### P2: Documentação (10 pts)
 
@@ -902,3 +1216,12 @@ const MENSAGENS_IZA = {
 - [ ] Testado com VoiceOver
 - [ ] Vídeo gravado (≤ 7 min)
 - [ ] Formulário de inscrição preenchido
+
+### IZA Inteligente
+- [ ] Classificação por regras funcionando
+- [ ] Extração de entidades (locais, datas)
+- [ ] Tela de sugestão com edição
+- [ ] Indicadores de confiança
+- [ ] Indicadores de privacidade
+- [ ] Modelo local opcional (Transformers.js)
+- [ ] Documentação de privacidade/LGPD
