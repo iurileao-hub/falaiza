@@ -11,11 +11,15 @@ import {
 } from "@/types/manifestacao";
 import { PreviewAnexo } from "@/types/anexo";
 import { TOTAL_ETAPAS, TIPOS_MANIFESTACAO } from "@/lib/constants";
+import type { ClassificacaoResultado } from "@/lib/iza";
 
 interface ManifestacaoState {
   // Dados da manifestação
   manifestacao: Partial<Manifestacao>;
   anexos: PreviewAnexo[];
+
+  // Classificação IA (IZA Inteligente)
+  classificacao: ClassificacaoResultado | null;
 
   // Estado do wizard
   etapaAtual: number;
@@ -28,6 +32,10 @@ interface ManifestacaoState {
   setIdentificacao: (identificacao: IdentificacaoCidadao | null) => void;
   setProtocolo: (protocolo: string) => void;
   setStatus: (status: StatusManifestacao) => void;
+
+  // Classificação IA
+  setClassificacao: (classificacao: ClassificacaoResultado) => void;
+  atualizarClassificacao: (dados: Partial<ClassificacaoResultado>) => void;
 
   // Anexos
   adicionarAnexo: (anexo: PreviewAnexo) => void;
@@ -65,6 +73,7 @@ export const useManifestacaoStore = create<ManifestacaoState>()(
     (set, get) => ({
       manifestacao: { ...estadoInicial },
       anexos: [],
+      classificacao: null,
       etapaAtual: 1,
 
       // Setters
@@ -134,6 +143,64 @@ export const useManifestacaoStore = create<ManifestacaoState>()(
           },
         })),
 
+      // Classificação IA
+      setClassificacao: (classificacao) =>
+        set((state) => {
+          // Sincronizar tipo e assunto da classificação com a manifestação
+          const tipoId = classificacao.tipo.id;
+          const orgaoId = classificacao.orgao.id;
+
+          return {
+            classificacao,
+            manifestacao: {
+              ...state.manifestacao,
+              tipo: tipoId,
+              assunto: {
+                categoria: orgaoId,
+              },
+              atualizadoEm: new Date(),
+            },
+          };
+        }),
+
+      atualizarClassificacao: (dados) =>
+        set((state) => {
+          if (!state.classificacao) return state;
+
+          const novaClassificacao = {
+            ...state.classificacao,
+            ...dados,
+            meta: {
+              ...state.classificacao.meta,
+              editadoPeloUsuario: true,
+            },
+          };
+
+          // Sincronizar com manifestação se tipo ou órgão mudaram
+          const updates: Partial<Manifestacao> = {
+            atualizadoEm: new Date(),
+          };
+
+          if (dados.tipo) {
+            updates.tipo = dados.tipo.id;
+          }
+          if (dados.orgao) {
+            updates.assunto = {
+              categoria: dados.orgao.id,
+              subcategoria: state.manifestacao.assunto?.subcategoria,
+              descricao: state.manifestacao.assunto?.descricao,
+            };
+          }
+
+          return {
+            classificacao: novaClassificacao,
+            manifestacao: {
+              ...state.manifestacao,
+              ...updates,
+            },
+          };
+        }),
+
       // Anexos
       adicionarAnexo: (anexo) =>
         set((state) => ({
@@ -173,31 +240,41 @@ export const useManifestacaoStore = create<ManifestacaoState>()(
         }),
 
       // Validação
+      /**
+       * Novo fluxo de 5 etapas (Story-First com IZA Inteligente):
+       * 1. Relato → Texto (min 20 chars) OU anexo
+       * 2. Sugestão → Classificação confirmada (tipo + órgão)
+       * 3. Anexos → Opcional
+       * 4. Identificação → Condicional (anônimo ou dados completos)
+       * 5. Confirmação → Sempre pode avançar
+       */
       podeAvancar: () => {
         const state = get();
-        const { manifestacao, anexos } = state;
+        const { manifestacao, anexos, classificacao } = state;
 
         switch (state.etapaAtual) {
-          case 1: // Tipo
-            return !!manifestacao.tipo;
-
-          case 2: // Assunto
-            return !!manifestacao.assunto?.categoria;
-
-          case 3: // Relato
+          case 1: // Relato (story-first)
             const temRelato = (manifestacao.relato?.length || 0) >= 20;
             const temAnexo = anexos.length > 0;
             return temRelato || temAnexo;
 
-          case 4: // Anexos
+          case 2: // Sugestão (classificação IA)
+            // Precisa ter classificação com tipo e órgão definidos
+            return !!(
+              classificacao &&
+              manifestacao.tipo &&
+              manifestacao.assunto?.categoria
+            );
+
+          case 3: // Anexos
             return true; // Opcional
 
-          case 5: // Identificação
+          case 4: // Identificação
             if (manifestacao.anonimo) return true;
             const id = manifestacao.identificacao;
             return !!(id?.nome && id?.cpf && id?.email);
 
-          case 6: // Confirmação
+          case 5: // Confirmação
             return true;
 
           default:
@@ -219,6 +296,7 @@ export const useManifestacaoStore = create<ManifestacaoState>()(
         set({
           manifestacao: { ...estadoInicial, criadoEm: new Date() },
           anexos: [],
+          classificacao: null,
           etapaAtual: 1,
         }),
     }),
@@ -226,9 +304,19 @@ export const useManifestacaoStore = create<ManifestacaoState>()(
       name: "manifestacao-ouvidoria",
       partialize: (state) => ({
         manifestacao: state.manifestacao,
-        anexos: state.anexos.map((a) => ({ ...a, url: "" })), // Não persistir URLs
+        // Não persistir anexos - blob URLs não sobrevivem ao reload
+        // O usuário precisará adicionar novamente após recarregar a página
+        anexos: [],
+        classificacao: state.classificacao,
         etapaAtual: state.etapaAtual,
       }),
+      // Ao reidratar, garantir que anexos inválidos sejam removidos
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          // Limpar anexos sem URL válida (não persistem entre sessões)
+          state.anexos = state.anexos.filter((a) => a.url && a.url.length > 0);
+        }
+      },
     }
   )
 );

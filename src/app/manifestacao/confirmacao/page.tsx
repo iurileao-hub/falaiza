@@ -136,19 +136,19 @@ export default function ConfirmacaoPage() {
   // Nova manifestação
   const handleNovaManifestaçao = () => {
     resetar();
-    router.push("/manifestacao/tipo?nova=true");
+    router.push("/manifestacao/relato?nova=true");
   };
 
-  // Voltar
+  // Voltar - Confirmação é etapa 5, anterior é Identificação (etapa 4)
   const handleVoltar = () => {
-    irParaEtapa(5);
+    irParaEtapa(4);
     router.push("/manifestacao/identificacao");
   };
 
   // Tela de sucesso
   if (submitStatus === "success") {
     return (
-      <WizardLayout etapaAtual={6}>
+      <WizardLayout etapaAtual={5}>
         <div className="text-center space-y-6">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-success/20">
             <CheckCircle2 className="h-10 w-10 text-success" />
@@ -264,7 +264,7 @@ export default function ConfirmacaoPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.push("/manifestacao/tipo")}
+              onClick={() => router.push("/manifestacao/sugestao")}
               className="text-primary"
             >
               Editar
@@ -272,19 +272,18 @@ export default function ConfirmacaoPage() {
           </div>
         </div>
 
-        {/* Assunto */}
+        {/* Assunto/Área */}
         <div className="border rounded-lg p-4">
           <div className="flex items-start gap-3">
             <div className="text-xl flex-shrink-0">{categoriaInfo?.icone}</div>
             <div className="flex-1">
-              <p className="text-sm text-muted">Assunto</p>
-              <p className="font-medium">{manifestacao.assunto?.descricao}</p>
-              <p className="text-sm text-muted">{categoriaInfo?.nome}</p>
+              <p className="text-sm text-muted">Área</p>
+              <p className="font-medium">{categoriaInfo?.nome || manifestacao.assunto?.categoria}</p>
             </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.push("/manifestacao/assunto")}
+              onClick={() => router.push("/manifestacao/sugestao")}
               className="text-primary"
             >
               Editar

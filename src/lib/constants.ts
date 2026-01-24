@@ -11,15 +11,17 @@ import { ConfiguracaoUpload } from "@/types/anexo";
 
 /**
  * Etapas do Wizard de Manifestação
- * Baseado no fluxo real do Participa DF (7 etapas)
+ * Fluxo "Story-First" com IZA Inteligente (5 etapas)
+ *
+ * Diferencial: Usuário conta sua história primeiro,
+ * depois a IZA sugere a classificação (tipo + órgão)
  */
 export const ETAPAS_WIZARD = [
-  { id: 1, slug: "tipo", nome: "Tipo", descricao: "Tipo de manifestação" },
-  { id: 2, slug: "assunto", nome: "Assunto", descricao: "Área ou categoria" },
-  { id: 3, slug: "relato", nome: "Relato", descricao: "Descreva sua demanda" },
-  { id: 4, slug: "anexos", nome: "Anexos", descricao: "Documentos e mídias" },
-  { id: 5, slug: "identificacao", nome: "Identificação", descricao: "Seus dados" },
-  { id: 6, slug: "confirmacao", nome: "Confirmação", descricao: "Revisar e enviar" },
+  { id: 1, slug: "relato", nome: "Relato", descricao: "Conte sua história" },
+  { id: 2, slug: "sugestao", nome: "Classificação", descricao: "Tipo e área" },
+  { id: 3, slug: "anexos", nome: "Anexos", descricao: "Documentos e mídias" },
+  { id: 4, slug: "identificacao", nome: "Identificação", descricao: "Seus dados" },
+  { id: 5, slug: "confirmacao", nome: "Confirmação", descricao: "Revisar e enviar" },
 ] as const;
 
 export const TOTAL_ETAPAS = ETAPAS_WIZARD.length;

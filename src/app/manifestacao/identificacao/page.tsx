@@ -58,15 +58,16 @@ export default function IdentificacaoPage() {
     [setAnonimo, setIdentificacao]
   );
 
+  // Novo fluxo: Identificação é etapa 4, próxima é Confirmação (etapa 5)
   const handleAvancar = () => {
     if (podeAvancar()) {
-      irParaEtapa(6);
+      irParaEtapa(5);
       router.push("/manifestacao/confirmacao");
     }
   };
 
   const handleVoltar = () => {
-    irParaEtapa(4);
+    irParaEtapa(3);
     router.push("/manifestacao/anexos");
   };
 
@@ -124,8 +125,8 @@ export default function IdentificacaoPage() {
 
       {/* Navegação */}
       <NavigationButtons
-        etapaAtual={5}
-        totalEtapas={6}
+        etapaAtual={4}
+        totalEtapas={5}
         podeAvancar={podeAvancar()}
         podeVoltar={true}
         onVoltar={handleVoltar}

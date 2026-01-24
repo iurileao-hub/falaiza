@@ -68,7 +68,7 @@ export default function HomePage() {
             </li>
             <li>
               <Link
-                href="/manifestacao/tipo"
+                href="/manifestacao/relato"
                 className="hover:text-gdf-yellow transition-colors no-underline font-semibold"
               >
                 Ouvidoria
@@ -116,7 +116,7 @@ export default function HomePage() {
             <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
               {/* Card Ouvidoria */}
               <Link
-                href="/manifestacao/tipo?nova=true"
+                href="/manifestacao/relato"
                 className="selection-card group no-underline text-foreground"
               >
                 <div className="text-6xl mb-4">🗣️</div>

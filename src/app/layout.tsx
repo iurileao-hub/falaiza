@@ -5,6 +5,7 @@ import "./globals.css";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-montserrat",
 });
@@ -82,7 +83,7 @@ export default function RootLayout({
         {/* Apple Touch Icons */}
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
       </head>
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <body className="min-h-screen bg-background text-foreground antialiased font-sans">
         {/* Skip Links para Acessibilidade */}
         <a
           href="#main-content"

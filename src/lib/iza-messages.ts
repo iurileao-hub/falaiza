@@ -78,7 +78,23 @@ export const MENSAGENS_IZA = {
   },
 
   /**
-   * Etapa 2: Assunto/Categoria
+   * Etapa 2 (novo fluxo): Sugestão Inteligente
+   * A IZA analisa o relato e sugere tipo e área automaticamente
+   */
+  sugestao: {
+    analisando: "Deixa eu analisar o que você me contou...",
+    confiancaAlta: (tipo: string, area: string) =>
+      `Entendi! Pelo que você me contou, isso parece ser ${tipo} sobre ${area}. Está certo?`,
+    confiancaMedia: (tipo: string, area: string) =>
+      `Analisando seu relato, acredito que seja ${tipo} relacionado a ${area}. Confira se está correto!`,
+    confiancaBaixa: (tipo: string, area: string) =>
+      `Não tenho certeza, mas pode ser ${tipo} sobre ${area}. Por favor, verifique e ajuste se necessário.`,
+    erro: "Ops, tive um probleminha ao analisar seu relato. Mas não se preocupe, você pode escolher manualmente!",
+    editado: "Classificação ajustada por você!",
+  },
+
+  /**
+   * Etapa 2 (fluxo antigo): Assunto/Categoria - mantido por compatibilidade
    */
   assunto: {
     inicial: (tipo: TipoManifestacao) =>
@@ -92,17 +108,18 @@ export const MENSAGENS_IZA = {
   },
 
   /**
-   * Etapa 3: Relato
+   * Etapa 1 (novo fluxo): Relato - Story First
+   * O cidadão conta sua história primeiro, depois a IZA sugere a classificação
    */
   relato: {
     inicial:
-      "Conta pra mim o que aconteceu. Você pode escrever, gravar áudio, tirar foto ou gravar vídeo. Use quantos formatos quiser!",
+      "Olá! Sou a IZA, assistente virtual da Ouvidoria do DF. Conta pra mim o que aconteceu! Você pode escrever, gravar áudio, tirar foto ou gravar vídeo. Use quantos formatos quiser!",
     dicaTexto: "Descreva com detalhes o que aconteceu: quando, onde e como foi.",
     dicaAudio: "💡 Dica: gravando em áudio fica mais fácil explicar os detalhes!",
-    dicaFoto: "📸 Fotos e vídeos ajudam muito a entender o problema.",
+    dicaFoto: "📸 Fotos e vídeos ajudam muito a entender o problema. Pode continuar se quiser!",
     minimo: "Escreva pelo menos 20 caracteres ou adicione uma mídia.",
     caracteresRestantes: (restantes: number) =>
-      `Você pode escrever mais ${restantes.toLocaleString("pt-BR")} caracteres.`,
+      `Falta pouco! Mais ${restantes} caracteres para continuar.`,
   },
 
   /**

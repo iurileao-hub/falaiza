@@ -37,8 +37,9 @@
   --space-xl: 2rem;
   --space-2xl: 3rem;
 
-  /* Tipografia */
-  --font-family: 'Montserrat', 'Muli', sans-serif;
+  /* Tipografia - Participa DF */
+  /* A fonte Montserrat é carregada via Next.js e aplicada com --font-montserrat */
+  --font-family: var(--font-montserrat, 'Montserrat'), 'Muli', Helvetica, Arial, sans-serif;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;

@@ -24,7 +24,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  href="/manifestacao/tipo?nova=true"
+                  href="/manifestacao/relato"
                   className="opacity-80 hover:opacity-100 transition-opacity no-underline text-white hover:text-white flex items-center gap-2"
                 >
                   Nova Manifestação

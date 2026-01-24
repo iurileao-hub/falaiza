@@ -7,8 +7,8 @@ export default function ManifestacaoPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirecionar para primeira etapa
-    router.replace("/manifestacao/tipo");
+    // Redirecionar para primeira etapa (Relato - story-first)
+    router.replace("/manifestacao/relato");
   }, [router]);
 
   return (

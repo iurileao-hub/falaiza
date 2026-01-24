@@ -149,16 +149,18 @@ export default function RelatoPage() {
     [anexos, removerAnexo]
   );
 
+  // Novo fluxo: Relato é etapa 1, próxima é Sugestão (etapa 2)
   const handleAvancar = () => {
     if (podeAvancar()) {
-      irParaEtapa(4);
-      router.push("/manifestacao/anexos");
+      irParaEtapa(2);
+      router.push("/manifestacao/sugestao");
     }
   };
 
   const handleVoltar = () => {
-    irParaEtapa(2);
-    router.push("/manifestacao/assunto");
+    // Etapa 1 - voltar para início
+    irParaEtapa(1);
+    router.push("/manifestacao");
   };
 
   return (
@@ -271,8 +273,8 @@ export default function RelatoPage() {
 
       {/* Navegação */}
       <NavigationButtons
-        etapaAtual={3}
-        totalEtapas={6}
+        etapaAtual={1}
+        totalEtapas={5}
         podeAvancar={podeAvancar()}
         podeVoltar={true}
         onVoltar={handleVoltar}

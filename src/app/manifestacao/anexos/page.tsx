@@ -96,14 +96,15 @@ export default function AnexosPage() {
     limparAnexos();
   }, [anexos, limparAnexos]);
 
+  // Novo fluxo: Anexos é etapa 3, próxima é Identificação (etapa 4)
   const handleAvancar = () => {
-    irParaEtapa(5);
+    irParaEtapa(4);
     router.push("/manifestacao/identificacao");
   };
 
   const handleVoltar = () => {
-    irParaEtapa(3);
-    router.push("/manifestacao/relato");
+    irParaEtapa(2);
+    router.push("/manifestacao/sugestao");
   };
 
   return (
@@ -261,8 +262,8 @@ export default function AnexosPage() {
 
       {/* Navegação */}
       <NavigationButtons
-        etapaAtual={4}
-        totalEtapas={6}
+        etapaAtual={3}
+        totalEtapas={5}
         podeAvancar={true} // Etapa opcional
         podeVoltar={true}
         onVoltar={handleVoltar}

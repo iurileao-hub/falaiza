@@ -115,7 +115,7 @@ export default function PerguntasFrequentesPage() {
   const [busca, setBusca] = useState("");
   const [abertos, setAbertos] = useState<number[]>([]);
 
-  const categorias = [...new Set(faqs.map((f) => f.categoria))];
+  const categorias = Array.from(new Set(faqs.map((f) => f.categoria)));
 
   const faqsFiltradas = faqs.filter(
     (faq) =>
@@ -130,9 +130,9 @@ export default function PerguntasFrequentesPage() {
   };
 
   return (
-    <main id="main-content" className="container py-8">
+    <div className="container py-8">
       <div className="max-w-3xl mx-auto">
-        <IzaMessage variant="default">
+        <IzaMessage>
           <h1 className="text-2xl font-bold text-primary mb-2">
             Perguntas Frequentes
           </h1>
@@ -217,6 +217,6 @@ export default function PerguntasFrequentesPage() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

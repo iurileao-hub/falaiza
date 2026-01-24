@@ -13,6 +13,8 @@ interface NavigationButtonsProps {
   onVoltar: () => void;
   onAvancar: () => void;
   onEnviar?: () => void;
+  textoAvancar?: string;
+  textoVoltar?: string;
   className?: string;
 }
 
@@ -25,6 +27,8 @@ export function NavigationButtons({
   onVoltar,
   onAvancar,
   onEnviar,
+  textoAvancar = "Avançar",
+  textoVoltar = "Voltar",
   className,
 }: NavigationButtonsProps) {
   const isUltimaEtapa = etapaAtual === totalEtapas;
@@ -36,24 +40,28 @@ export function NavigationButtons({
         className
       )}
     >
-      {/* Botão Voltar */}
+      {/* Botão Voltar - Estilo Participa DF */}
       <Button
         type="button"
         variant="outline"
         onClick={onVoltar}
         disabled={!podeVoltar || isSubmitting}
-        className={cn(!podeVoltar && "invisible")}
+        className={cn(
+          "bg-[#28477D] text-white border-[#28477D] hover:bg-[#1E3A5F] hover:border-[#1E3A5F] hover:text-white",
+          !podeVoltar && "invisible"
+        )}
       >
         <ChevronLeft className="h-4 w-4 mr-2" />
-        Voltar
+        {textoVoltar}
       </Button>
 
-      {/* Botão Avançar ou Enviar */}
+      {/* Botão Avançar ou Enviar - Estilo Participa DF (Verde) */}
       {isUltimaEtapa ? (
         <Button
           type="button"
           onClick={onEnviar}
           disabled={!podeAvancar || isSubmitting}
+          className="bg-[#549250] hover:bg-[#3d7039] text-white"
         >
           {isSubmitting ? (
             <>
@@ -72,8 +80,9 @@ export function NavigationButtons({
           type="button"
           onClick={onAvancar}
           disabled={!podeAvancar || isSubmitting}
+          className="bg-[#549250] hover:bg-[#3d7039] text-white disabled:bg-gray-300 disabled:text-gray-500"
         >
-          Avançar
+          {textoAvancar}
           <ChevronRight className="h-4 w-4 ml-2" />
         </Button>
       )}

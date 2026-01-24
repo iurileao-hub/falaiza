@@ -14,13 +14,33 @@ Este arquivo fornece orientações para o assistente de programação **Claude C
 
 ## Status do Projeto
 
-**Fase atual:** Planejamento concluído - Pronto para implementação
+**Fase atual:** Implementação em andamento - IZA Inteligente (Camada 1 concluída)
+
+### Progresso
+
+- [x] PWA base implementada
+- [x] Wizard de 5 etapas (story-first)
+- [x] IZA Inteligente - Camada 1 (Regras) ✅
+- [ ] **PRÓXIMA SESSÃO:** IZA Inteligente - Camada 2 (Modelo Local com Transformers.js)
+- [ ] IZA Inteligente - Camada 3 (Backend GDF - especificação)
+- [x] Header/Navbar estilo Participa DF
+- [x] Acessibilidade (WCAG 2.1 AA)
 
 ### Documentação Disponível
 
 - `docs/analise-participa-df.md` — Análise completa do sistema atual
 - `docs/plans/2026-01-20-pwa-ouvidoria-design.md` — Plano de implementação detalhado
 - `docs/DODF-hackathon.md` — Edital completo
+
+### ⚠️ PRÓXIMA SESSÃO - IMPORTANTE
+
+**Implementar Camada 2 (Modelo Local):**
+1. Instalar `@xenova/transformers` para inferência no browser
+2. Usar modelo de classificação de texto em português (ex: `neuralmind/bert-base-portuguese-cased`)
+3. Implementar `classificarComModeloLocal()` em `src/lib/iza/engine.ts`
+4. Testar classificação com textos complexos
+5. Medir tempo de carregamento e inferência
+6. Configurar lazy loading do modelo (não bloquear UI)
 
 ---
 
@@ -41,10 +61,12 @@ Este arquivo fornece orientações para o assistente de programação **Claude C
 
 ### Abordagem de Design
 
-- **Wizard Conversacional Híbrido** — Combina estrutura de wizard (6 etapas) com tom conversacional da IZA
+- **Story-First Flow** — Usuário conta sua história primeiro, IZA classifica automaticamente (5 etapas)
+- **IZA Inteligente** — Classificação em 3 camadas: Regras → Modelo Local → Backend GDF
 - **Multicanalidade Simultânea** — Usuário pode enviar texto + áudio + foto + vídeo na mesma manifestação
 - **Captura Nativa** — MediaRecorder API para gravação direta (não só upload)
 - **Identidade Visual** — Replicar cores, fontes e elementos do Participa DF atual
+- **Privacidade por Design** — Camadas 1 e 2 processam 100% local, dados nunca saem do dispositivo
 
 ### Paleta de Cores
 
@@ -129,16 +151,19 @@ hackathon-ouvidoria-df/
 
 ---
 
-## Fluxo do Wizard (6 Etapas)
+## Fluxo do Wizard (5 Etapas - Story-First)
 
 | # | Rota | Descrição | Validação |
 |---|------|-----------|-----------|
-| 1 | `/manifestacao/tipo` | Tipo de manifestação (6 cards) | Obrigatório |
-| 2 | `/manifestacao/assunto` | Categoria/área (busca + chips) | Obrigatório |
-| 3 | `/manifestacao/relato` | Texto + mídia simultânea | Mín 20 chars OU 1 mídia |
-| 4 | `/manifestacao/anexos` | Adicionar mais arquivos | Opcional (máx 25MB) |
-| 5 | `/manifestacao/identificacao` | Dados ou anônimo | Condicional |
-| 6 | `/manifestacao/confirmacao` | Resumo + protocolo | Final |
+| 1 | `/manifestacao/relato` | Usuário conta sua história (texto + mídia) | Mín 20 chars OU 1 mídia |
+| 2 | `/manifestacao/sugestao` | IZA sugere tipo/área automaticamente | Classificação confirmada |
+| 3 | `/manifestacao/anexos` | Adicionar mais arquivos | Opcional (máx 25MB) |
+| 4 | `/manifestacao/identificacao` | Dados ou anônimo | Condicional |
+| 5 | `/manifestacao/confirmacao` | Resumo + protocolo | Final |
+
+**Páginas obsoletas (redirecionam para novo fluxo):**
+- `/manifestacao/tipo` → redireciona para `/manifestacao/relato`
+- `/manifestacao/assunto` → redireciona para `/manifestacao/sugestao`
 
 ### Tipos de Manifestação
 
@@ -160,13 +185,44 @@ hackathon-ouvidoria-df/
 - **Tom:** Amigável, acolhedor, primeira pessoa
 - **Variações visuais:** Default, com lupa (identificação), sucesso, erro
 
+### IZA Inteligente - Arquitetura de Classificação
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    CAMADA 1: REGRAS                         │
+│  • Palavras-chave + frases                                  │
+│  • Extração de entidades (locais, datas, órgãos)            │
+│  • 100% local, 0 KB, < 5ms                                  │
+│  • Arquivo: src/lib/iza/rules-engine.ts                     │
+├─────────────────────────────────────────────────────────────┤
+│                 CAMADA 2: MODELO LOCAL                      │
+│  • Transformers.js (BERT português)                         │
+│  • ~50MB download único, inferência local                   │
+│  • 100% local, dados NUNCA saem do dispositivo              │
+│  • Arquivo: src/lib/iza/engine.ts (TODO)                    │
+├─────────────────────────────────────────────────────────────┤
+│                 CAMADA 3: BACKEND GDF                       │
+│  • API do GDF (especificação futura)                        │
+│  • Requer consentimento explícito                           │
+│  • Dados enviados apenas para servidores do GDF             │
+│  • Arquivo: src/lib/iza/engine.ts (especificação)           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Arquivos principais:**
+- `src/lib/iza/keywords.ts` — Regras de palavras-chave
+- `src/lib/iza/rules-engine.ts` — Engine da Camada 1
+- `src/lib/iza/engine.ts` — Orquestrador das 3 camadas
+- `src/hooks/useClassificacao.ts` — Hook React para classificação
+- `src/components/iza/IzaSugestaoInteligente.tsx` — UI de sugestão
+
 ### Exemplos de Falas
 
 ```
 "Olá! Sou a IZA, assistente da Ouvidoria do Distrito Federal."
 "Entendi! Você quer fazer uma reclamação."
 "Conta pra mim o que aconteceu. Use quantos formatos quiser!"
-"Estamos quase lá! Você quer se identificar ou prefere enviar de forma anônima?"
+"Estamos quase lá! Você quer se identificar ou prefere enviar de forma anônimo?"
 "🎉 Manifestação enviada com sucesso!"
 ```
 

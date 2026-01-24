@@ -92,9 +92,9 @@ export default function AcompanharPage() {
   };
 
   return (
-    <main id="main-content" className="container py-8">
+    <div className="container py-8">
       <div className="max-w-2xl mx-auto">
-        <IzaMessage variant="default">
+        <IzaMessage>
           <h1 className="text-2xl font-bold text-primary mb-2">
             Acompanhar Manifestação
           </h1>
@@ -122,7 +122,7 @@ export default function AcompanharPage() {
             </div>
             <Button
               type="submit"
-              variant="primary"
+              variant="default"
               disabled={buscando}
               className="sm:w-auto"
             >
@@ -222,6 +222,6 @@ export default function AcompanharPage() {
           </p>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
