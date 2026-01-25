@@ -157,10 +157,32 @@ export function usePhotoCapture(
 
       setStream(mediaStream);
 
-      // Conectar ao elemento de vídeo
+      // Conectar ao elemento de vídeo e aguardar estar pronto
       if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        await videoRef.current.play();
+        const video = videoRef.current;
+        video.srcObject = mediaStream;
+
+        // Aguardar o vídeo ter dimensões válidas (importante para iOS)
+        await new Promise<void>((resolve, reject) => {
+          const timeoutId = setTimeout(() => {
+            reject(new Error("Timeout aguardando câmera"));
+          }, 10000); // 10 segundos de timeout
+
+          const checkReady = () => {
+            if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
+              clearTimeout(timeoutId);
+              resolve();
+            }
+          };
+
+          video.onloadeddata = checkReady;
+          video.onloadedmetadata = checkReady;
+
+          // Verificar se já está pronto
+          checkReady();
+
+          video.play().catch(reject);
+        });
       }
 
       setStatus("ready");
@@ -200,7 +222,27 @@ export function usePhotoCapture(
 
   // Capturar foto
   const capture = useCallback(() => {
-    if (status !== "ready" || !videoRef.current || !stream) {
+    if (status !== "ready") {
+      const errorMsg = "Câmera não está pronta. Aguarde ou tente novamente.";
+      setError(errorMsg);
+      setStatus("error");
+      onError?.(new Error(errorMsg));
+      return;
+    }
+
+    if (!videoRef.current) {
+      const errorMsg = "Elemento de vídeo não encontrado.";
+      setError(errorMsg);
+      setStatus("error");
+      onError?.(new Error(errorMsg));
+      return;
+    }
+
+    if (!stream) {
+      const errorMsg = "Stream de vídeo não disponível.";
+      setError(errorMsg);
+      setStatus("error");
+      onError?.(new Error(errorMsg));
       return;
     }
 
@@ -208,7 +250,7 @@ export function usePhotoCapture(
 
     // Verificar se o vídeo está pronto (importante para iOS)
     if (video.readyState < 2 || video.videoWidth === 0 || video.videoHeight === 0) {
-      const errorMsg = "Aguarde a câmera carregar completamente.";
+      const errorMsg = `Aguarde a câmera carregar. Estado: ${video.readyState}, Dimensões: ${video.videoWidth}x${video.videoHeight}`;
       setError(errorMsg);
       setStatus("error");
       onError?.(new Error(errorMsg));
