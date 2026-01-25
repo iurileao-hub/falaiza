@@ -124,6 +124,17 @@ export function usePhotoCapture(
     };
   }, [cleanup, url]);
 
+  // Conectar stream ao elemento de vídeo quando stream mudar
+  useEffect(() => {
+    if (videoRef.current && stream && status === "ready") {
+      const video = videoRef.current;
+      video.srcObject = stream;
+      video.play().catch(() => {
+        // Ignorar erro de autoplay - alguns navegadores bloqueiam
+      });
+    }
+  }, [stream, status]);
+
   // Solicitar permissão e preparar câmera
   const prepare = useCallback(async () => {
     if (!isSupported) {
@@ -146,45 +157,30 @@ export function usePhotoCapture(
     setError(null);
 
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode,
-          width: { ideal: maxWidth },
-          height: { ideal: maxHeight },
-        },
-        audio: false,
-      });
+      let mediaStream: MediaStream;
 
-      setStream(mediaStream);
-
-      // Conectar ao elemento de vídeo e aguardar estar pronto
-      if (videoRef.current) {
-        const video = videoRef.current;
-        video.srcObject = mediaStream;
-
-        // Aguardar o vídeo ter dimensões válidas (importante para iOS)
-        await new Promise<void>((resolve, reject) => {
-          const timeoutId = setTimeout(() => {
-            reject(new Error("Timeout aguardando câmera"));
-          }, 10000); // 10 segundos de timeout
-
-          const checkReady = () => {
-            if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
-              clearTimeout(timeoutId);
-              resolve();
-            }
-          };
-
-          video.onloadeddata = checkReady;
-          video.onloadedmetadata = checkReady;
-
-          // Verificar se já está pronto
-          checkReady();
-
-          video.play().catch(reject);
+      // Tentar câmera com facingMode especificado
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: facingMode },
+            width: { ideal: maxWidth },
+            height: { ideal: maxHeight },
+          },
+          audio: false,
+        });
+      } catch {
+        // Se falhar, tentar sem especificar facingMode (qualquer câmera)
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: maxWidth },
+            height: { ideal: maxHeight },
+          },
+          audio: false,
         });
       }
 
+      setStream(mediaStream);
       setStatus("ready");
     } catch (err) {
       let errorMsg = "Erro ao acessar a câmera.";
@@ -221,7 +217,7 @@ export function usePhotoCapture(
   ]);
 
   // Capturar foto
-  const capture = useCallback(() => {
+  const capture = useCallback(async () => {
     if (status !== "ready") {
       const errorMsg = "Câmera não está pronta. Aguarde ou tente novamente.";
       setError(errorMsg);
@@ -248,13 +244,42 @@ export function usePhotoCapture(
 
     const video = videoRef.current;
 
-    // Verificar se o vídeo está pronto (importante para iOS)
+    // Garantir que o stream está conectado ao vídeo
+    if (!video.srcObject) {
+      video.srcObject = stream;
+      try {
+        await video.play();
+      } catch {
+        // Ignorar erro de autoplay
+      }
+    }
+
+    // Aguardar o vídeo estar pronto (com timeout)
     if (video.readyState < 2 || video.videoWidth === 0 || video.videoHeight === 0) {
-      const errorMsg = `Aguarde a câmera carregar. Estado: ${video.readyState}, Dimensões: ${video.videoWidth}x${video.videoHeight}`;
-      setError(errorMsg);
-      setStatus("error");
-      onError?.(new Error(errorMsg));
-      return;
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const timeoutId = setTimeout(() => {
+            reject(new Error("Timeout"));
+          }, 3000);
+
+          const checkReady = () => {
+            if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
+              clearTimeout(timeoutId);
+              video.removeEventListener("loadeddata", checkReady);
+              resolve();
+            }
+          };
+
+          video.addEventListener("loadeddata", checkReady);
+          checkReady(); // Verificar imediatamente
+        });
+      } catch {
+        const errorMsg = `Câmera não carregou. Estado: ${video.readyState}, Dimensões: ${video.videoWidth}x${video.videoHeight}. Tente novamente.`;
+        setError(errorMsg);
+        setStatus("error");
+        onError?.(new Error(errorMsg));
+        return;
+      }
     }
 
     // Criar canvas se não existir
