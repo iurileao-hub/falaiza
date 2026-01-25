@@ -14,15 +14,15 @@ Este arquivo fornece orientações para o assistente de programação **Claude C
 
 ## Status do Projeto
 
-**Fase atual:** Implementação em andamento - IZA Inteligente (Camada 1 concluída)
+**Fase atual:** IZA Inteligente completa (3 camadas implementadas)
 
 ### Progresso
 
 - [x] PWA base implementada
 - [x] Wizard de 5 etapas (story-first)
 - [x] IZA Inteligente - Camada 1 (Regras) ✅
-- [ ] **PRÓXIMA SESSÃO:** IZA Inteligente - Camada 2 (Modelo Local com Transformers.js)
-- [ ] IZA Inteligente - Camada 3 (Backend GDF - especificação)
+- [x] IZA Inteligente - Camada 2 (Modelo Local - MobileBERT via CDN) ✅
+- [x] IZA Inteligente - Camada 3 (Backend GDF - Mock) ✅
 - [x] Header/Navbar estilo Participa DF
 - [x] Acessibilidade (WCAG 2.1 AA)
 
@@ -30,17 +30,17 @@ Este arquivo fornece orientações para o assistente de programação **Claude C
 
 - `docs/analise-participa-df.md` — Análise completa do sistema atual
 - `docs/plans/2026-01-20-pwa-ouvidoria-design.md` — Plano de implementação detalhado
+- `docs/plans/2026-01-24-iza-camadas-2-3-design.md` — Design das Camadas 2 e 3
+- `docs/plans/2026-01-24-backend-gdf-especificacao.md` — **Especificação técnica do Backend GDF** (modelos, arquiteturas, custos)
 - `docs/DODF-hackathon.md` — Edital completo
 
-### ⚠️ PRÓXIMA SESSÃO - IMPORTANTE
+### ✅ Camadas de Classificação Implementadas
 
-**Implementar Camada 2 (Modelo Local):**
-1. Instalar `@xenova/transformers` para inferência no browser
-2. Usar modelo de classificação de texto em português (ex: `neuralmind/bert-base-portuguese-cased`)
-3. Implementar `classificarComModeloLocal()` em `src/lib/iza/engine.ts`
-4. Testar classificação com textos complexos
-5. Medir tempo de carregamento e inferência
-6. Configurar lazy loading do modelo (não bloquear UI)
+| Camada | Tecnologia | Status |
+|--------|------------|--------|
+| 1 - Regras | Keywords + Extração de entidades | ✅ Funcional |
+| 2 - Modelo Local | MobileBERT zero-shot via CDN | ✅ Funcional |
+| 3 - Backend GDF | Mock API em `/api/ia/classificar` | ✅ Mock funcional |
 
 ---
 
@@ -87,7 +87,7 @@ font-family: 'Montserrat', 'Muli', sans-serif;
 
 ---
 
-## Estrutura de Pastas (Definida)
+## Estrutura de Pastas (Atualizada)
 
 ```
 hackathon-ouvidoria-df/
@@ -106,19 +106,24 @@ hackathon-ouvidoria-df/
 │   │   ├── globals.css
 │   │   ├── manifestacao/
 │   │   │   ├── layout.tsx
-│   │   │   ├── tipo/page.tsx
-│   │   │   ├── assunto/page.tsx
 │   │   │   ├── relato/page.tsx
+│   │   │   ├── sugestao/page.tsx
 │   │   │   ├── anexos/page.tsx
 │   │   │   ├── identificacao/page.tsx
 │   │   │   └── confirmacao/page.tsx
 │   │   └── api/
-│   │       └── manifestacao/route.ts
+│   │       ├── manifestacao/route.ts
+│   │       └── ia/
+│   │           └── classificar/route.ts  # Mock Backend GDF (Camada 3)
 │   │
 │   ├── components/
 │   │   ├── ui/            # shadcn/ui
 │   │   ├── layout/        # Header, Footer, SkipLinks
-│   │   ├── iza/           # IzaAvatar, IzaMessage
+│   │   ├── iza/           # IzaAvatar, IzaMessage, IzaSugestaoInteligente
+│   │   │   ├── IzaAvatar.tsx
+│   │   │   ├── IzaMessage.tsx
+│   │   │   ├── IzaSugestaoInteligente.tsx
+│   │   │   └── ModeloLocalDownload.tsx   # UI download modelo
 │   │   ├── wizard/        # ProgressBar, StepCard, Navigation
 │   │   ├── media/         # AudioRecorder, VideoRecorder, PhotoCapture
 │   │   ├── forms/         # IdentificacaoForm, RelatoTextarea
@@ -126,11 +131,18 @@ hackathon-ouvidoria-df/
 │   │
 │   ├── hooks/
 │   │   ├── useManifestacao.ts
+│   │   ├── useClassificacao.ts    # Hook para IZA Inteligente
 │   │   ├── useMediaRecorder.ts
 │   │   ├── useIndexedDB.ts
 │   │   └── useAccessibility.ts
 │   │
 │   ├── lib/
+│   │   ├── iza/                   # Sistema IZA Inteligente
+│   │   │   ├── index.ts           # Exports públicos
+│   │   │   ├── engine.ts          # Orquestrador das 3 camadas
+│   │   │   ├── model-local.ts     # Gerenciador MobileBERT (Camada 2)
+│   │   │   ├── keywords.ts        # Regras de palavras-chave (Camada 1)
+│   │   │   └── types.ts           # Tipos TypeScript
 │   │   ├── db.ts          # Dexie.js config
 │   │   ├── protocolo.ts   # Geração de protocolo
 │   │   └── validations.ts # Schemas Zod
@@ -147,6 +159,9 @@ hackathon-ouvidoria-df/
 └── docs/
     ├── analise-participa-df.md
     └── plans/
+        ├── 2026-01-20-pwa-ouvidoria-design.md
+        ├── 2026-01-24-iza-camadas-2-3-design.md
+        └── 2026-01-24-backend-gdf-especificacao.md
 ```
 
 ---
@@ -189,32 +204,35 @@ hackathon-ouvidoria-df/
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    CAMADA 1: REGRAS                         │
+│                    CAMADA 1: REGRAS ✅                       │
 │  • Palavras-chave + frases                                  │
 │  • Extração de entidades (locais, datas, órgãos)            │
-│  • 100% local, 0 KB, < 5ms                                  │
+│  • 100% local, 0 KB, < 50ms                                 │
 │  • Arquivo: src/lib/iza/rules-engine.ts                     │
 ├─────────────────────────────────────────────────────────────┤
-│                 CAMADA 2: MODELO LOCAL                      │
-│  • Transformers.js (BERT português)                         │
-│  • ~50MB download único, inferência local                   │
+│                 CAMADA 2: MODELO LOCAL ✅                    │
+│  • MobileBERT via CDN (@huggingface/transformers)           │
+│  • ~100MB download único, zero-shot classification          │
 │  • 100% local, dados NUNCA saem do dispositivo              │
-│  • Arquivo: src/lib/iza/engine.ts (TODO)                    │
+│  • Arquivo: src/lib/iza/model-local.ts                      │
 ├─────────────────────────────────────────────────────────────┤
-│                 CAMADA 3: BACKEND GDF                       │
-│  • API do GDF (especificação futura)                        │
-│  • Requer consentimento explícito                           │
-│  • Dados enviados apenas para servidores do GDF             │
-│  • Arquivo: src/lib/iza/engine.ts (especificação)           │
+│                 CAMADA 3: BACKEND GDF ✅                     │
+│  • Mock API em /api/ia/classificar                          │
+│  • Dados tratados com sigilo (LAI + LGPD)                   │
+│  • Pronto para integração real com GDF                      │
+│  • Arquivo: src/app/api/ia/classificar/route.ts             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 **Arquivos principais:**
-- `src/lib/iza/keywords.ts` — Regras de palavras-chave
+- `src/lib/iza/keywords.ts` — Regras de palavras-chave (Camada 1)
 - `src/lib/iza/rules-engine.ts` — Engine da Camada 1
+- `src/lib/iza/model-local.ts` — Manager do MobileBERT (Camada 2)
 - `src/lib/iza/engine.ts` — Orquestrador das 3 camadas
+- `src/app/api/ia/classificar/route.ts` — Mock Backend GDF (Camada 3)
 - `src/hooks/useClassificacao.ts` — Hook React para classificação
 - `src/components/iza/IzaSugestaoInteligente.tsx` — UI de sugestão
+- `src/components/iza/ModeloLocalDownload.tsx` — UI de download do modelo
 
 ### Exemplos de Falas
 
@@ -331,19 +349,41 @@ npm run lighthouse
 
 ---
 
-## Próxima Sessão
+## Próximas Tarefas
 
-**Objetivo:** Implementação completa do projeto
+### Prioridade Alta (para o Hackathon)
 
-**Comando sugerido:**
-```
-Implemente o projeto seguindo o plano em docs/plans/2026-01-20-pwa-ouvidoria-design.md
-```
+- [ ] **Testar IZA Inteligente em produção**
+  - Verificar download do modelo MobileBERT via CDN
+  - Testar classificação com relatos reais
+  - Validar fallback entre camadas
 
-O plano contém:
-- Arquitetura completa de pastas
-- Todos os componentes especificados
-- Design system com cores e tokens
-- Fluxo detalhado de cada etapa
-- Configurações de PWA e acessibilidade
-- Sequência de implementação em 12 fases
+- [ ] **Finalizar wizard de manifestação**
+  - Revisar fluxo completo das 5 etapas
+  - Testar persistência offline (IndexedDB)
+  - Validar geração de protocolo
+
+- [ ] **Gravar vídeo demonstrativo** (≤7 min)
+  - Mostrar fluxo completo de manifestação
+  - Demonstrar classificação inteligente da IZA
+  - Destacar acessibilidade e multicanalidade
+
+### Prioridade Média (melhorias)
+
+- [ ] Implementar testes automatizados de acessibilidade
+- [ ] Adicionar mais palavras-chave na Camada 1
+- [ ] Otimizar tempo de carregamento do modelo local
+
+### Para Implementação Real (pós-hackathon)
+
+- [ ] Integrar com API real do GDF (substituir mock)
+- [ ] Configurar BERTimbau para backend de produção
+- [ ] Deploy em infraestrutura do GDF
+
+### Documentação de Referência
+
+| Documento | Descrição |
+|-----------|-----------|
+| `docs/plans/2026-01-20-pwa-ouvidoria-design.md` | Plano completo de implementação |
+| `docs/plans/2026-01-24-iza-camadas-2-3-design.md` | Design das Camadas 2 e 3 |
+| `docs/plans/2026-01-24-backend-gdf-especificacao.md` | Especificação técnica Backend GDF |

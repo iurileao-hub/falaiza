@@ -27,11 +27,18 @@ export {
   classificacaoConfiavel,
   nivelConfianca,
   modeloLocalPronto,
-  baixarModeloLocal,
+  baixarModelo,
+  getInfoModeloLocal,
   getConfigIA,
   setConfigIA,
   resetConfigIA,
   getCamadaAtiva,
+  // Re-exports do model-local
+  TAMANHO_MODELO_MB,
+  getStatusModelo,
+  getProgressoDownload,
+  onStatusChange,
+  descarregarModelo,
 } from './engine';
 
 // Tipos

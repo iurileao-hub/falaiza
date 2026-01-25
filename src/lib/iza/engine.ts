@@ -15,6 +15,15 @@ import type {
 } from './types';
 
 import { classificarPorRegras, classificacaoConfiavel } from './rules-engine';
+import {
+  modeloEstaPronto,
+  classificarComModelo,
+  baixarModelo as baixarModeloLocal,
+  getStatusModelo,
+  getProgressoDownload,
+  onStatusChange,
+  TAMANHO_MODELO_MB,
+} from './model-local';
 
 // ============================================================================
 // Estado Global do Engine
@@ -22,118 +31,149 @@ import { classificarPorRegras, classificacaoConfiavel } from './rules-engine';
 
 /** Configuração padrão de IA */
 const configPadrao: ConfiguracaoIA = {
-  modeloLocalDisponivel: false, // Será true quando Transformers.js estiver disponível
-  modeloLocalBaixado: false,
-  usarModeloLocal: false,
-  backendGDFDisponivel: false, // Futuro
-  usarBackendGDF: false,
+  modeloLocalDisponivel: true, // Transformers.js está disponível
+  modeloLocalBaixado: false,   // Será atualizado quando o modelo for baixado
+  usarModeloLocal: true,       // Habilitado por padrão
+  backendGDFDisponivel: true,  // Mock disponível
+  usarBackendGDF: true,        // Habilitado por padrão
 };
 
 let configAtual: ConfiguracaoIA = { ...configPadrao };
 
+// Sincronizar estado do modelo local com a configuração
+onStatusChange((estado) => {
+  configAtual.modeloLocalBaixado = estado.status === 'pronto';
+});
+
 // ============================================================================
-// Camada 2: Modelo Local (Placeholder)
+// Camada 2: Modelo Local (MobileBERT via Transformers.js)
 // ============================================================================
 
 /**
- * Placeholder para classificação com modelo local
- * Será implementado com Transformers.js
+ * Classifica usando o modelo local MobileBERT
+ * Zero-shot classification - não requer treino específico
+ *
+ * PRIVACIDADE: Dados processados 100% localmente
  */
 async function classificarComModeloLocal(
   relato: string,
   onProgress?: (progresso: number) => void
 ): Promise<ClassificacaoResultado | null> {
-  // TODO: Implementar com Transformers.js
-  // Por enquanto, retorna null para usar fallback das regras
-  console.log('[IZA] Modelo local não implementado ainda');
-
-  if (onProgress) {
-    onProgress(1);
+  if (!modeloEstaPronto()) {
+    console.log('[IZA] Modelo local não está pronto');
+    onProgress?.(1);
+    return null;
   }
 
-  return null;
+  console.log('[IZA] Classificando com modelo local...');
+  onProgress?.(0.3);
+
+  const resultado = await classificarComModelo(relato);
+
+  onProgress?.(1);
+  return resultado;
 }
 
 /**
  * Verifica se o modelo local está pronto para uso
  */
 export function modeloLocalPronto(): boolean {
-  return configAtual.modeloLocalBaixado && configAtual.usarModeloLocal;
+  return modeloEstaPronto() && configAtual.usarModeloLocal;
 }
 
 /**
- * Inicia o download do modelo local
+ * Inicia o download do modelo local MobileBERT
+ *
+ * @param onProgress - Callback de progresso (0-1)
+ * @returns true se download bem sucedido
  */
-export async function baixarModeloLocal(
+export async function baixarModelo(
   onProgress?: (progresso: number) => void
 ): Promise<boolean> {
-  // TODO: Implementar download do modelo Transformers.js
-  console.log('[IZA] Download do modelo local não implementado ainda');
+  console.log('[IZA] Iniciando download do modelo local...');
 
-  if (onProgress) {
-    // Simular progresso
-    for (let i = 0; i <= 100; i += 10) {
-      await new Promise(r => setTimeout(r, 100));
-      onProgress(i / 100);
-    }
+  const sucesso = await baixarModeloLocal(onProgress);
+
+  if (sucesso) {
+    configAtual.modeloLocalBaixado = true;
+    console.log('[IZA] Modelo local pronto para uso');
   }
 
-  // Por enquanto, marca como não disponível
-  configAtual.modeloLocalBaixado = false;
-  return false;
+  return sucesso;
+}
+
+/**
+ * Retorna informações sobre o modelo local
+ */
+export function getInfoModeloLocal() {
+  return {
+    status: getStatusModelo(),
+    progresso: getProgressoDownload(),
+    tamanhoMB: TAMANHO_MODELO_MB,
+    pronto: modeloEstaPronto(),
+  };
 }
 
 // ============================================================================
-// Camada 3: Backend GDF (Especificação)
+// Camada 3: Backend GDF (Mock para demonstração)
 // ============================================================================
 
 /**
- * Placeholder para classificação via Backend GDF
- * Documentado para implementação futura
+ * Classifica via Backend GDF (mock local para demonstração)
+ *
+ * Em produção, esta função faria uma chamada real à API do GDF.
+ * O mock simula o comportamento esperado para validação da arquitetura.
+ *
+ * SIGILO: Os dados enviados ao GDF são tratados com sigilo conforme
+ * a Lei de Acesso à Informação e LGPD.
  */
 async function classificarComBackendGDF(
   relato: string,
-  _onProgress?: (progresso: number) => void
+  onProgress?: (progresso: number) => void
 ): Promise<ClassificacaoResultado | null> {
-  // Backend GDF não está disponível no protótipo
-  // Esta função documenta a interface esperada
-
-  console.log('[IZA] Backend GDF não disponível (especificação futura)');
-
-  /*
-  // Exemplo de implementação futura:
-  const response = await fetch('/api/ia/classificar', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      relato,
-      privacidade: {
-        consentimento: true,
-        naoArmazenar: true,
-      },
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Erro ao classificar via Backend GDF');
+  // Verificar se está online
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    console.log('[IZA] Sem conexão - Backend GDF indisponível');
+    return null;
   }
 
-  const data = await response.json();
-  return {
-    tipo: data.tipo,
-    orgao: data.orgao,
-    entidades: data.entidades,
-    resumo: data.resumo.medio,
-    meta: {
-      fonte: 'backend_gdf',
-      processadoEm: new Date(),
-      tempoProcessamento: data.meta.tempoProcessamento,
-      editadoPeloUsuario: false,
-    },
-  };
-  */
+  console.log('[IZA] Classificando via Backend GDF (mock)...');
+  onProgress?.(0.3);
 
-  return null;
+  try {
+    const response = await fetch('/api/ia/classificar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ relato }),
+    });
+
+    onProgress?.(0.8);
+
+    if (!response.ok) {
+      throw new Error(`Erro HTTP: ${response.status}`);
+    }
+
+    const data = await response.json();
+    onProgress?.(1);
+
+    return {
+      tipo: data.tipo,
+      orgao: data.orgao,
+      entidades: data.entidades || { locais: [], datas: [], orgaosMencionados: [] },
+      resumo: data.resumo || '',
+      meta: {
+        fonte: 'backend_gdf',
+        processadoEm: new Date(),
+        tempoProcessamento: data.meta?.tempoProcessamento || 0,
+        editadoPeloUsuario: false,
+      },
+    };
+
+  } catch (error) {
+    console.warn('[IZA] Erro no Backend GDF:', error);
+    onProgress?.(1);
+    return null;
+  }
 }
 
 // ============================================================================
@@ -297,3 +337,10 @@ export {
   getOrgaoMeta,
   artigoTipo,
 } from './keywords';
+export {
+  TAMANHO_MODELO_MB,
+  getStatusModelo,
+  getProgressoDownload,
+  onStatusChange,
+  descarregarModelo,
+} from './model-local';

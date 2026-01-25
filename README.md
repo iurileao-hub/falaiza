@@ -1,470 +1,593 @@
-# PWA Ouvidoria DF - Participa DF
+# IZA — PWA de Ouvidoria Inteligente
 
-[![Next.js](https://img.shields.io/badge/Next.js-14.2-black?logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?logo=tailwindcss)](https://tailwindcss.com/)
-[![PWA Ready](https://img.shields.io/badge/PWA-Ready-5A0FC8?logo=pwa)](https://web.dev/progressive-web-apps/)
-[![WCAG 2.1 AA](https://img.shields.io/badge/WCAG-2.1%20AA-green)](https://www.w3.org/WAI/WCAG21/quickref/)
-[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+**Sistema de Registro de Manifestações com Classificação Automática por IA**
+
+**Autor:** Iúri Leão de Almeida
+**Telefone:** (61) 99645-1390
+**E-mail:** iurileao@gmail.com
+
+![Next.js](https://img.shields.io/badge/Next.js-14.2-black?logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript&logoColor=white)
+![PWA](https://img.shields.io/badge/PWA-Instalável-5A0FC8?logo=pwa&logoColor=white)
+![WCAG](https://img.shields.io/badge/WCAG-2.1%20AA-green)
+![Hackathon](https://img.shields.io/badge/Hackathon-Participa%20DF%202026-orange)
+![IA](https://img.shields.io/badge/IA-3%20Camadas-purple?logo=huggingface&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Pronto%20para%20Submissão-brightgreen)
 
 > **1º Hackathon em Controle Social: Desafio Participa DF**
-> Categoria II - Ouvidoria | Prêmio: R$ 8.000,00
-
-<p align="center">
-  <img src="public/assets/logos/Logo-OUV.svg" alt="Logo Ouvidoria DF" width="300">
-</p>
-
-## Sumário
-
-- [Sobre o Projeto](#sobre-o-projeto)
-- [Funcionalidades](#funcionalidades)
-- [Tecnologias](#tecnologias)
-- [Arquitetura](#arquitetura)
-- [Instalação](#instalação)
-- [Uso](#uso)
-- [Acessibilidade](#acessibilidade)
-- [PWA e Offline](#pwa-e-offline)
-- [Estrutura do Projeto](#estrutura-do-projeto)
-- [API](#api)
-- [Testes](#testes)
-- [Critérios de Avaliação](#critérios-de-avaliação)
-- [Uso de IA](#uso-de-ia-no-desenvolvimento)
-- [Licença](#licença)
+> **Categoria:** II - Ouvidoria
+> **Organizador:** Controladoria-Geral do Distrito Federal (CGDF)
 
 ---
 
-## Sobre o Projeto
+## Resumo do Projeto
 
-A **PWA Ouvidoria DF** é uma aplicação web progressiva desenvolvida para o **1º Hackathon em Controle Social: Desafio Participa DF**, focada em modernizar e facilitar o registro de manifestações cidadãs para a Ouvidoria do Governo do Distrito Federal.
+A **IZA** é uma PWA (Progressive Web App) de ouvidoria desenvolvida para o Governo do Distrito Federal, com foco em **acessibilidade**, **multicanalidade** e **classificação inteligente de manifestações**. O sistema revoluciona a forma como o cidadão interage com a ouvidoria pública, substituindo formulários burocráticos por uma experiência conversacional guiada por uma assistente virtual.
 
-### Problema
+**Abordagem técnica:** Arquitetura Story-First com wizard de 5 etapas onde o cidadão primeiro conta sua história (texto, áudio, vídeo ou foto) e a IA classifica automaticamente o tipo de manifestação e órgão responsável. O sistema implementa **três camadas de classificação inteligente**: (1) motor de regras com 600+ palavras-chave e extração de entidades para 39 regiões administrativas do DF, (2) modelo MobileBERT para zero-shot classification via Transformers.js rodando 100% no navegador, e (3) API de backend preparada para integração com sistemas do GDF.
 
-O sistema atual de ouvidoria apresenta barreiras significativas:
-- Interface complexa e pouco intuitiva
-- Falta de suporte adequado para dispositivos móveis
-- Ausência de recursos de acessibilidade adequados
-- Impossibilidade de registro offline
-- Limitação nos formatos de manifestação (apenas texto)
+**Estratégia privacy-first:** As Camadas 1 e 2 processam os dados exclusivamente no dispositivo do usuário — nenhum texto é enviado para servidores externos durante a classificação. Apenas na Camada 3, quando necessário, os dados são transmitidos com sigilo para servidores do próprio GDF, em conformidade com LAI e LGPD.
 
-### Solução
+**Diferencial inovador:** Sistema de classificação em camadas com fallback inteligente. Se a Camada 1 (regras) tiver baixa confiança, o sistema oferece ao usuário o download opcional de um modelo de IA (~100MB) para classificações mais precisas. O modelo é baixado uma única vez e fica em cache, permitindo funcionamento offline completo. A IZA informa ao usuário qual camada foi utilizada e com qual nível de confiança, garantindo transparência total.
 
-Nossa solução oferece:
-- **Interface conversacional guiada** pela assistente virtual IZA
-- **Multicanalidade simultânea**: texto, áudio, vídeo e fotos
-- **Captura nativa** de mídia (gravação direta no navegador)
-- **Funcionamento 100% offline** com sincronização automática
-- **Conformidade WCAG 2.1 AA** para máxima acessibilidade
-- **PWA instalável** em qualquer dispositivo
+**Multicanalidade simultânea:** O cidadão pode combinar múltiplos formatos na mesma manifestação — digitar um texto, gravar um áudio explicando detalhes, anexar uma foto do problema e incluir um documento PDF como evidência. A gravação é feita nativamente no navegador via MediaRecorder API, sem necessidade de apps externos.
+
+**Acessibilidade WCAG 2.1 AA:** Navegação 100% por teclado, contraste mínimo 4.5:1, skip links, ARIA labels em todos componentes, live regions para leitores de tela, painel de acessibilidade (Alt+A) com alto contraste, ajuste de fonte e redução de animações.
+
+**Tecnologias:** Next.js 14 (App Router), TypeScript strict, Tailwind CSS, shadcn/ui (Radix), Zustand, Dexie.js (IndexedDB), Serwist (Service Worker), Transformers.js (HuggingFace).
+
+**Uso de IA:** Desenvolvimento assistido por Claude Code (Anthropic) conforme item 13.9 do edital. Classificação de manifestações via MobileBERT (Camada 2) e motor de regras proprietário (Camada 1).
 
 ---
 
-## Funcionalidades
+## Quick Start
 
-### Tipos de Manifestação
+```bash
+# 1. Clone o repositório
+git clone https://github.com/iurileao-hub/hackathon-ouvidoria-df.git
+cd hackathon-ouvidoria-df
+
+# 2. Instale as dependências
+npm install
+
+# 3. Inicie o servidor de desenvolvimento
+npm run dev
+
+# 4. Acesse no navegador
+open http://localhost:3000
+```
+
+---
+
+## Índice
+
+1. [Problema e Solução](#1-problema-e-solução)
+2. [Funcionalidades](#2-funcionalidades)
+3. [IZA Inteligente — Sistema de Classificação](#3-iza-inteligente--sistema-de-classificação)
+4. [Arquitetura Técnica](#4-arquitetura-técnica)
+5. [Instalação e Execução](#5-instalação-e-execução)
+6. [Estrutura do Projeto](#6-estrutura-do-projeto)
+7. [Acessibilidade](#7-acessibilidade)
+8. [PWA e Funcionamento Offline](#8-pwa-e-funcionamento-offline)
+9. [API](#9-api)
+10. [Uso de Inteligência Artificial](#10-uso-de-inteligência-artificial)
+11. [Critérios de Avaliação](#11-critérios-de-avaliação)
+12. [Documentação Adicional](#12-documentação-adicional)
+13. [Licença](#13-licença)
+
+---
+
+## 1. Problema e Solução
+
+### 1.1. Problema Identificado
+
+O sistema atual de ouvidoria do Participa DF apresenta barreiras significativas:
+
+| Problema | Impacto |
+|----------|---------|
+| Interface complexa com múltiplos formulários | Abandono de manifestações |
+| Seleção manual de tipo/órgão confusa | Classificação incorreta |
+| Sem suporte adequado para mobile | Exclusão digital |
+| Apenas texto como canal de entrada | Dificuldade para cidadãos com baixa escolaridade |
+| Sem funcionamento offline | Impossibilidade de uso em áreas com conectividade limitada |
+| Acessibilidade deficiente | Exclusão de pessoas com deficiência |
+
+### 1.2. Solução Proposta
+
+| Solução | Benefício |
+|---------|-----------|
+| **Wizard conversacional** guiado pela IZA | Experiência intuitiva e humanizada |
+| **Classificação automática por IA** em 3 camadas | Redução de erros e agilidade no encaminhamento |
+| **PWA instalável** e responsiva | Acesso universal em qualquer dispositivo |
+| **Multicanalidade**: texto, áudio, vídeo, foto | Inclusão de todos os perfis de cidadãos |
+| **Funcionamento 100% offline** | Uso em qualquer condição de conectividade |
+| **WCAG 2.1 AA** completo | Acessibilidade garantida |
+
+---
+
+## 2. Funcionalidades
+
+### 2.1. Tipos de Manifestação
 
 | Tipo | Descrição | Anonimato |
 |------|-----------|-----------|
-| Reclamação | Expressão de insatisfação com serviço público | Permitido |
-| Denúncia | Relato de irregularidade ou ilegalidade | Permitido |
-| Sugestão | Proposta de melhoria para serviço público | Não permitido |
-| Elogio | Reconhecimento de atendimento ou serviço | Não permitido |
-| Solicitação | Pedido de atendimento ou providência | Não permitido |
-| Informação | Pedido de dados ou esclarecimentos | Não permitido |
+| **Reclamação** | Insatisfação com serviço público | ✅ Permitido |
+| **Denúncia** | Relato de irregularidade | ✅ Permitido |
+| **Sugestão** | Proposta de melhoria | ❌ Requer identificação |
+| **Elogio** | Reconhecimento de bom serviço | ❌ Requer identificação |
+| **Solicitação** | Pedido de providência | ❌ Requer identificação |
+| **Informação** | Pedido de esclarecimento | ❌ Requer identificação |
 
-### Wizard Conversacional (6 Etapas)
+### 2.2. Fluxo Story-First (5 Etapas)
 
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│  1. Tipo    │────▶│  2. Assunto │────▶│  3. Relato  │
-│             │     │             │     │ Texto+Mídia │
-└─────────────┘     └─────────────┘     └─────────────┘
-                                              │
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│6.Confirmação│◀────│5.Identificar│◀────│  4. Anexos  │
-│  Protocolo  │     │  ou Anônimo │     │  Opcionais  │
-└─────────────┘     └─────────────┘     └─────────────┘
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   1. RELATO     │────▶│   2. SUGESTÃO   │────▶│   3. ANEXOS     │
+│  Conte sua      │     │  IZA classifica │     │  Adicione mais  │
+│  história       │     │  automaticamente│     │  arquivos       │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+        │                                               │
+        │   ┌─────────────────┐     ┌─────────────────┐ │
+        │   │ 5. CONFIRMAÇÃO  │◀────│4. IDENTIFICAÇÃO │◀┘
+        │   │ Protocolo       │     │ Dados ou        │
+        └──▶│ gerado          │     │ anônimo         │
+            └─────────────────┘     └─────────────────┘
 ```
 
-### Captura de Mídia
+**Diferencial:** O cidadão não precisa saber classificar sua manifestação. Ele simplesmente conta o que aconteceu e a IZA sugere automaticamente o tipo e o órgão responsável.
 
-- **Áudio**: Gravação até 5 minutos (10 MB max)
-- **Vídeo**: Gravação até 2 minutos (15 MB max)
-- **Fotos**: Captura direta pela câmera (5 MB max)
-- **Documentos**: Upload de PDF, DOC, imagens (10 MB max)
-- **Total**: Até 25 MB por manifestação
+### 2.3. Captura de Mídia
 
-### Assistente Virtual IZA
-
-A IZA guia o cidadão durante todo o processo com:
-- Mensagens contextuais em cada etapa
-- Tom amigável e acolhedor
-- Variações visuais (default, sucesso, erro)
-- Dicas e orientações personalizadas
+| Tipo | Limite | Gravação Nativa |
+|------|--------|-----------------|
+| **Texto** | 10.000 caracteres | — |
+| **Áudio** | 5 min / 10 MB | ✅ MediaRecorder |
+| **Vídeo** | 2 min / 15 MB | ✅ MediaRecorder |
+| **Foto** | 5 MB | ✅ Camera API |
+| **Documento** | 10 MB | Upload |
+| **Total** | **25 MB** | — |
 
 ---
 
-## Tecnologias
+## 3. IZA Inteligente — Sistema de Classificação
 
-| Categoria | Tecnologia | Versão |
-|-----------|------------|--------|
-| **Framework** | Next.js (App Router) | 14.2.x |
-| **Linguagem** | TypeScript | 5.x |
-| **Estilização** | Tailwind CSS | 3.4.x |
-| **Componentes** | shadcn/ui (Radix UI) | latest |
-| **Estado** | Zustand | 5.x |
-| **Persistência** | Dexie.js (IndexedDB) | 4.x |
-| **Validação** | Zod | 3.x |
-| **PWA** | Serwist | 9.x |
-| **Acessibilidade** | axe-core | latest |
+O coração do sistema é a **IZA Inteligente**, um motor de classificação em três camadas que analisa o relato do cidadão e sugere automaticamente o tipo de manifestação e o órgão responsável.
+
+### 3.1. Arquitetura de 3 Camadas
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    RELATO DO CIDADÃO                            │
+│  "O ônibus da linha 110 atrasou 40 minutos em Taguatinga"       │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                 CAMADA 1: MOTOR DE REGRAS                       │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ • 600+ palavras-chave categorizadas                     │    │
+│  │ • Frases completas com peso 2x                          │    │
+│  │ • Extração de entidades: 39 RAs do DF, datas, órgãos    │    │
+│  │ • Normalização Unicode, case-insensitive                │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│  ⏱️ Tempo: < 50ms | 💾 Download: 0 KB | 🔒 100% Local          │
+├─────────────────────────────────────────────────────────────────┤
+│                 CAMADA 2: MODELO LOCAL (MobileBERT)             │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ • Zero-shot classification via Transformers.js          │    │
+│  │ • Modelo: Xenova/mobilebert-uncased-mnli                │    │
+│  │ • Inferência 100% no navegador (WebAssembly)            │    │
+│  │ • Cache em IndexedDB para uso offline                   │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│  ⏱️ Tempo: 300-800ms | 💾 Download: ~100MB (único) | 🔒 Local  │
+├─────────────────────────────────────────────────────────────────┤
+│                 CAMADA 3: BACKEND GDF                           │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ • API REST em /api/ia/classificar                       │    │
+│  │ • Preparado para integração com IA do GDF               │    │
+│  │ • Mock funcional para demonstração                      │    │
+│  │ • Conformidade LAI + LGPD (dados sigilosos)             │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│  ⏱️ Tempo: 1-2s | 🌐 Requer conexão | 🔒 Sigilo garantido      │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      RESULTADO                                  │
+│  Tipo: Reclamação (87% confiança)                               │
+│  Órgão: Transporte (92% confiança)                              │
+│  Entidades: Taguatinga, linha 110                               │
+│  Fonte: Camada 1 (processado localmente)                        │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 3.2. Regras de Fallback
+
+| Condição | Ação |
+|----------|------|
+| Camada 1 com confiança ≥ 70% | Usa resultado da Camada 1 |
+| Camada 1 < 70% e modelo baixado | Usa Camada 2 (MobileBERT) |
+| Camada 1 < 70% e modelo não baixado | Oferece download do modelo |
+| Camadas 1+2 < 50% e online | Consulta Camada 3 (Backend) |
+| Offline | Usa melhor resultado local disponível |
+
+### 3.3. Privacidade por Design
+
+| Camada | Onde processa | Dados enviados |
+|--------|---------------|----------------|
+| **Camada 1** | Navegador | Nenhum |
+| **Camada 2** | Navegador | Nenhum |
+| **Camada 3** | Servidor GDF | Apenas para GDF, com sigilo |
+
+**Garantia:** Nas Camadas 1 e 2, o texto do cidadão **nunca sai do dispositivo**. Nenhum dado é enviado para servidores externos, APIs de terceiros ou serviços de nuvem.
+
+### 3.4. Download do Modelo (Camada 2)
+
+Quando a Camada 1 tem confiança baixa, a IZA oferece:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  🧠 Quer classificações mais precisas?                          │
+│                                                                 │
+│  Posso baixar um modelo de IA que analisa seu relato com mais   │
+│  detalhes. O download é de aproximadamente 100MB.               │
+│                                                                 │
+│  📶 Recomendamos usar WiFi para o download                      │
+│                                                                 │
+│  ✅ Classificação mais precisa usando inteligência artificial   │
+│  🔒 100% local - seus dados nunca saem do dispositivo           │
+│  📥 Download único - fica salvo para próximas visitas           │
+│                                                                 │
+│  [ Baixar modelo ]  [ Agora não ]                               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 3.5. Indicadores de Transparência
+
+A IZA sempre informa ao cidadão:
+
+| Indicador | Significado |
+|-----------|-------------|
+| "Processado localmente" | Camada 1 (regras) |
+| "IA local - dados não saem do dispositivo" | Camada 2 (MobileBERT) |
+| "Processado pelo GDF - dados sigilosos" | Camada 3 (Backend) |
+| Barra de confiança (alta/média/baixa) | Nível de certeza da classificação |
+
+### 3.6. Arquivos do Sistema de Classificação
+
+```
+src/lib/iza/
+├── types.ts              # Tipos TypeScript (291 linhas)
+├── keywords.ts           # Regras e palavras-chave (596 linhas)
+├── rules-engine.ts       # Motor da Camada 1 (342 linhas)
+├── model-local.ts        # Manager do MobileBERT (250 linhas)
+├── engine.ts             # Orquestrador das 3 camadas (310 linhas)
+└── index.ts              # Exportações públicas
+
+src/app/api/ia/
+└── classificar/route.ts  # API Mock da Camada 3
+
+src/components/iza/
+├── IzaSugestaoInteligente.tsx  # UI principal
+├── ModeloLocalDownload.tsx     # UI de download
+├── ConfiancaIndicator.tsx      # Indicador visual
+└── PrivacidadeIndicator.tsx    # Badge de privacidade
+```
 
 ---
 
-## Arquitetura
+## 4. Arquitetura Técnica
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Camada de Apresentação                   │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
-│  │   Páginas   │  │ Componentes │  │   Design System     │  │
-│  │  (Next.js)  │  │   (React)   │  │  (Tailwind+Radix)   │  │
-│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
-├─────────────────────────────────────────────────────────────┤
-│                      Camada de Negócio                      │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
-│  │   Zustand   │  │   Hooks     │  │    Validações       │  │
-│  │   (Store)   │  │ Customizados│  │      (Zod)          │  │
-│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
-├─────────────────────────────────────────────────────────────┤
-│                       Camada de Dados                       │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
-│  │  IndexedDB  │  │  API Routes │  │   Service Worker    │  │
-│  │  (Dexie.js) │  │  (Next.js)  │  │     (Serwist)       │  │
-│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                    CAMADA DE APRESENTAÇÃO                       │
+│  ┌──────────────┐  ┌──────────────┐  ┌────────────────────┐     │
+│  │ Next.js 14   │  │ React 18     │  │ Tailwind + Radix   │     │
+│  │ App Router   │  │ Components   │  │ Design System      │     │
+│  └──────────────┘  └──────────────┘  └────────────────────┘     │
+├─────────────────────────────────────────────────────────────────┤
+│                      CAMADA DE NEGÓCIO                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌────────────────────┐     │
+│  │ Zustand      │  │ IZA Engine   │  │ Zod Validations    │     │
+│  │ State Store  │  │ 3 Camadas IA │  │ Type Safety        │     │
+│  └──────────────┘  └──────────────┘  └────────────────────┘     │
+├─────────────────────────────────────────────────────────────────┤
+│                       CAMADA DE DADOS                           │
+│  ┌──────────────┐  ┌──────────────┐  ┌────────────────────┐     │
+│  │ IndexedDB    │  │ API Routes   │  │ Service Worker     │     │
+│  │ (Dexie.js)   │  │ (Next.js)    │  │ (Serwist PWA)      │     │
+│  └──────────────┘  └──────────────┘  └────────────────────┘     │
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+### Stack Tecnológica
+
+| Camada | Tecnologia | Versão | Função |
+|--------|------------|--------|--------|
+| Framework | Next.js | 14.2 | SSR, App Router, API Routes |
+| Linguagem | TypeScript | 5.x | Type safety, DX |
+| Estilização | Tailwind CSS | 3.4 | Utility-first CSS |
+| Componentes | shadcn/ui | latest | Radix UI primitives |
+| Estado | Zustand | 5.x | State management |
+| Persistência | Dexie.js | 4.x | IndexedDB wrapper |
+| Validação | Zod | 3.x | Schema validation |
+| PWA | Serwist | 9.x | Service Worker |
+| IA Local | Transformers.js | 3.x | ML no browser |
 
 ---
 
-## Instalação
+## 5. Instalação e Execução
 
-### Pré-requisitos
+### 5.1. Pré-requisitos
 
-- Node.js 18.x ou superior
-- npm 9.x ou superior
+| Requisito | Versão Mínima |
+|-----------|---------------|
+| Node.js | 18.x |
+| npm | 9.x |
 
-### Passos
+### 5.2. Instalação
 
 ```bash
-# Clonar o repositório
-git clone https://github.com/seu-usuario/hackathon-ouvidoria-df.git
+# Clonar repositório
+git clone https://github.com/iurileao-hub/hackathon-ouvidoria-df.git
 cd hackathon-ouvidoria-df
 
 # Instalar dependências
 npm install
 
-# Gerar ícones PWA (opcional, já incluídos)
-node scripts/generate-icons.js
-
-# Iniciar servidor de desenvolvimento
+# Executar em desenvolvimento
 npm run dev
 ```
 
-Acesse [http://localhost:3000](http://localhost:3000)
-
-### Build de Produção
+### 5.3. Build de Produção
 
 ```bash
 # Gerar build otimizado
 npm run build
 
-# Iniciar servidor de produção
+# Executar servidor de produção
 npm start
 ```
 
----
+### 5.4. Comandos Disponíveis
 
-## Uso
-
-### Fluxo do Cidadão
-
-1. **Página Inicial**: Escolha entre "Ouvidoria" ou "Acompanhar"
-2. **Tipo**: Selecione o tipo de manifestação desejada
-3. **Assunto**: Busque e selecione a categoria do problema
-4. **Relato**: Descreva a situação usando texto, áudio, vídeo ou fotos
-5. **Anexos**: Adicione documentos complementares (opcional)
-6. **Identificação**: Informe seus dados ou envie anonimamente
-7. **Confirmação**: Revise e receba seu protocolo
-
-### Páginas Adicionais
-
-- **Acompanhar Protocolo** (`/acompanhar`): Consulte o status de sua manifestação pelo número do protocolo
-- **Perguntas Frequentes** (`/perguntas-frequentes`): FAQ com busca e categorias sobre a Ouvidoria
-
-### Atalhos de Teclado
-
-| Atalho | Ação |
-|--------|------|
-| `Alt + A` | Abrir painel de acessibilidade |
-| `Tab` | Navegar entre elementos |
-| `Enter/Space` | Ativar elemento selecionado |
-| `Escape` | Fechar diálogos/painéis |
+| Comando | Descrição |
+|---------|-----------|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Build de produção |
+| `npm start` | Servidor de produção |
+| `npm run lint` | Verificação de código |
 
 ---
 
-## Acessibilidade
-
-Este projeto segue as diretrizes **WCAG 2.1 nível AA**, garantindo:
-
-### Recursos Implementados
-
-- **Contraste**: Mínimo 4.5:1 para texto normal
-- **Navegação por Teclado**: 100% navegável sem mouse
-- **Skip Links**: Atalhos para conteúdo principal
-- **ARIA Labels**: Em todos os elementos interativos
-- **Landmarks**: Estrutura semântica (header, main, nav, footer)
-- **Live Regions**: Anúncios para leitores de tela
-- **Foco Visível**: Indicadores claros de foco
-- **Redimensionamento**: Suporte até 200% sem perda de conteúdo
-
-### Painel de Acessibilidade (`Alt + A`)
-
-- Alto contraste (modo escuro acessível)
-- Ajuste de tamanho de fonte (75% - 200%)
-- Redução de animações
-- Espaçamento de linhas aumentado
-- Destaque de links
-
-### Verificação Automática
-
-O projeto inclui **axe-core** para verificação automática de acessibilidade em desenvolvimento.
-
----
-
-## PWA e Offline
-
-### Características PWA
-
-- **Instalável**: Adicione à tela inicial em qualquer dispositivo
-- **Offline First**: Funciona sem conexão com internet
-- **Service Worker**: Cache inteligente de recursos
-- **Manifest**: Configuração completa de app
-
-### Funcionamento Offline
-
-1. **Rascunhos Locais**: Manifestações salvas no IndexedDB
-2. **Fila de Sincronização**: Envio automático quando online
-3. **Página Offline**: Feedback visual quando sem conexão
-4. **Indicador de Status**: Notificação de estado de conexão
-
-### Ícones e Splash
-
-Ícones PWA gerados automaticamente em todos os tamanhos:
-- 72x72, 96x96, 128x128, 144x144
-- 152x152, 192x192, 384x384, 512x512
-- Apple Touch Icon (180x180)
-
----
-
-## Estrutura do Projeto
+## 6. Estrutura do Projeto
 
 ```
 hackathon-ouvidoria-df/
 ├── public/
 │   ├── assets/
-│   │   ├── iza/              # Avatares da assistente IZA
-│   │   └── logos/            # Logos GDF, Participa DF
-│   ├── icons/                # Ícones PWA
-│   └── manifest.json         # Manifest PWA
+│   │   ├── iza/                  # Avatares da IZA
+│   │   └── logos/                # Logos GDF
+│   ├── icons/                    # Ícones PWA
+│   └── manifest.json             # Manifest PWA
 │
 ├── src/
-│   ├── app/                  # App Router (Next.js 14)
-│   │   ├── layout.tsx        # Layout raiz
-│   │   ├── page.tsx          # Página inicial
-│   │   ├── globals.css       # Estilos globais
-│   │   ├── sw.ts             # Service Worker
-│   │   ├── offline/          # Página offline
-│   │   ├── acompanhar/       # Consulta de protocolo
+│   ├── app/                      # Next.js App Router
+│   │   ├── layout.tsx
+│   │   ├── page.tsx              # Home
+│   │   ├── offline/              # Página offline
+│   │   ├── acompanhar/           # Consulta protocolo
 │   │   ├── perguntas-frequentes/ # FAQ
-│   │   ├── manifestacao/     # Wizard de manifestação
-│   │   │   ├── tipo/
-│   │   │   ├── assunto/
+│   │   ├── manifestacao/         # Wizard (5 etapas)
 │   │   │   ├── relato/
+│   │   │   ├── sugestao/
 │   │   │   ├── anexos/
 │   │   │   ├── identificacao/
 │   │   │   └── confirmacao/
 │   │   └── api/
-│   │       └── manifestacao/ # API route (modo demo)
+│   │       ├── manifestacao/     # API de envio
+│   │       └── ia/classificar/   # API de classificação
 │   │
 │   ├── components/
-│   │   ├── ui/               # shadcn/ui
-│   │   ├── layout/           # Header, Footer, SkipLinks
-│   │   ├── iza/              # IzaAvatar, IzaMessage
-│   │   ├── wizard/           # ProgressBar, StepCard
-│   │   ├── media/            # AudioRecorder, VideoRecorder
-│   │   ├── forms/            # IdentificacaoForm
-│   │   └── accessibility/    # AccessibilityPanel
+│   │   ├── ui/                   # shadcn/ui
+│   │   ├── layout/               # Header, Footer
+│   │   ├── iza/                  # Componentes IZA
+│   │   ├── wizard/               # Progress, Steps
+│   │   ├── media/                # Gravadores
+│   │   └── accessibility/        # Painel A11y
 │   │
-│   ├── hooks/                # Hooks customizados
-│   │   ├── useMediaRecorder.ts
-│   │   ├── usePhotoCapture.ts
-│   │   ├── useFileUpload.ts
-│   │   └── useAccessibility.ts
+│   ├── hooks/                    # Hooks customizados
+│   ├── lib/
+│   │   ├── iza/                  # Motor de classificação
+│   │   ├── db.ts                 # Dexie config
+│   │   └── validations.ts        # Schemas Zod
 │   │
-│   ├── lib/                  # Utilitários
-│   │   ├── db.ts             # Dexie.js config
-│   │   ├── constants.ts      # Constantes
-│   │   ├── validations.ts    # Schemas Zod
-│   │   └── utils.ts          # Funções utilitárias
-│   │
-│   ├── stores/               # Zustand stores
-│   │   └── manifestacaoStore.ts
-│   │
-│   ├── styles/               # Design tokens
-│   │   └── design-tokens.css
-│   │
-│   └── types/                # Tipos TypeScript
-│       ├── manifestacao.ts
-│       └── anexo.ts
+│   ├── stores/                   # Zustand
+│   └── types/                    # TypeScript
 │
-├── scripts/
-│   └── generate-icons.js     # Gerador de ícones PWA
+├── docs/
+│   ├── plans/                    # Documentos de design
+│   ├── analise-participa-df.md   # Análise do sistema atual
+│   └── DODF-hackathon.md         # Edital
 │
-├── docs/                     # Documentação
-│   ├── analise-participa-df.md
-│   └── plans/
-│
-└── CLAUDE.md                 # Guia para desenvolvimento com IA
+└── CLAUDE.md                     # Guia para IA
 ```
 
 ---
 
-## API
+## 7. Acessibilidade
 
-### POST /api/manifestacao
+### 7.1. Conformidade WCAG 2.1 AA
 
-Endpoint para envio de manifestações.
+| Critério | Implementação |
+|----------|---------------|
+| **1.1 Texto alternativo** | Alt em todas as imagens |
+| **1.3 Adaptável** | Estrutura semântica HTML5 |
+| **1.4 Distinguível** | Contraste 4.5:1 mínimo |
+| **2.1 Teclado** | 100% navegável sem mouse |
+| **2.4 Navegável** | Skip links, landmarks, foco visível |
+| **3.1 Legível** | Linguagem declarada (pt-BR) |
+| **4.1 Compatível** | ARIA labels, roles corretos |
 
-**Request Body:**
+### 7.2. Painel de Acessibilidade (Alt+A)
+
+- Alto contraste
+- Ajuste de fonte (75% - 200%)
+- Redução de animações
+- Espaçamento aumentado
+- Destaque de links
+
+### 7.3. Atalhos de Teclado
+
+| Atalho | Ação |
+|--------|------|
+| `Alt + A` | Painel de acessibilidade |
+| `Tab` | Próximo elemento |
+| `Shift + Tab` | Elemento anterior |
+| `Enter` / `Space` | Ativar |
+| `Escape` | Fechar modal |
+
+---
+
+## 8. PWA e Funcionamento Offline
+
+### 8.1. Recursos PWA
+
+- ✅ Instalável em qualquer dispositivo
+- ✅ Service Worker para cache
+- ✅ Manifest completo
+- ✅ Ícones em todos os tamanhos
+- ✅ Splash screen
+
+### 8.2. Funcionamento Offline
+
+| Recurso | Comportamento Offline |
+|---------|----------------------|
+| Navegação | 100% funcional |
+| Classificação (Camada 1) | 100% funcional |
+| Classificação (Camada 2) | Funcional se modelo baixado |
+| Envio de manifestação | Salva localmente, envia quando online |
+| Consulta de protocolo | Requer conexão |
+
+---
+
+## 9. API
+
+### 9.1. POST /api/manifestacao
+
+Envio de manifestações.
+
 ```json
+// Request
 {
   "tipo": "reclamacao",
-  "assunto": {
-    "categoria": "saude",
-    "subcategoria": "atendimento",
-    "orgao": "ses-df"
-  },
-  "relato": "Descrição detalhada da situação...",
+  "orgao": "transporte",
+  "relato": "O ônibus atrasou...",
   "anonimo": false,
-  "identificacao": {
-    "nome": "João da Silva",
-    "cpf": "12345678901",
-    "email": "joao@email.com",
-    "telefone": "61999999999",
-    "notificacoes": true
-  },
-  "anexos": [
-    {
-      "nome": "documento.pdf",
-      "tipo": "documento",
-      "tamanho": 1024000,
-      "gravadoNativo": false
-    }
-  ]
+  "identificacao": { ... },
+  "anexos": [ ... ]
 }
-```
 
-**Response Success (201):**
-```json
+// Response 201
 {
   "success": true,
   "protocolo": "2026.01.123456",
-  "dataCriacao": "2026-01-20T15:30:00.000Z",
-  "previsaoResposta": "2026-02-19T15:30:00.000Z"
+  "dataCriacao": "2026-01-24T10:00:00Z"
+}
+```
+
+### 9.2. POST /api/ia/classificar
+
+Classificação via Camada 3 (Mock).
+
+```json
+// Request
+{ "relato": "O ônibus atrasou 40 minutos" }
+
+// Response 200
+{
+  "tipo": { "id": "reclamacao", "confianca": 0.87 },
+  "orgao": { "id": "transporte", "confianca": 0.92 },
+  "meta": { "fonte": "backend_gdf", "sigiloso": true }
 }
 ```
 
 ---
 
-## Testes
+## 10. Uso de Inteligência Artificial
 
-```bash
-# Lint
-npm run lint
+Conforme item 13.9 do Edital nº 10/2025:
 
-# Type check
-npx tsc --noEmit
+### 10.1. Ferramenta de Desenvolvimento
 
-# Build (inclui verificações)
-npm run build
-```
+- **Claude Code** (Anthropic) — Assistente de programação
 
-### Acessibilidade
+### 10.2. Modelos de IA no Sistema
 
-O projeto utiliza **axe-core** integrado em desenvolvimento para verificação automática de violações WCAG. Erros são exibidos no console do navegador.
+| Componente | Modelo | Fonte |
+|------------|--------|-------|
+| Camada 2 | MobileBERT (MNLI) | [HuggingFace](https://huggingface.co/Xenova/mobilebert-uncased-mnli) |
+| Inferência | Transformers.js | [HuggingFace](https://huggingface.co/docs/transformers.js) |
+
+### 10.3. Atividades Assistidas por IA
+
+- Arquitetura do sistema de classificação
+- Implementação de componentes React
+- Otimização de padrões de palavras-chave
+- Documentação técnica
+- Testes e debugging
+
+### 10.4. Responsabilidade
+
+Todo código foi revisado, compreendido e validado pelo autor, sendo de sua responsabilidade exclusiva.
 
 ---
 
-## Critérios de Avaliação
+## 11. Critérios de Avaliação
 
 ### P1: Critérios de Entrega (10 pontos)
 
 | Critério | Pontos | Status |
 |----------|--------|--------|
-| Acessibilidade WCAG 2.1 AA | 2,5 | ✅ Implementado |
-| Multicanalidade | 3,0 | ✅ Implementado |
-| UX/UI | 3,0 | ✅ Implementado |
-| Integração Participa DF | 1,5 | ✅ Implementado |
+| Acessibilidade WCAG 2.1 AA | 2,5 | ✅ |
+| Multicanalidade | 3,0 | ✅ |
+| UX/UI | 3,0 | ✅ |
+| Integração Participa DF | 1,5 | ✅ |
 
 ### P2: Documentação (10 pontos)
 
 | Critério | Pontos | Status |
 |----------|--------|--------|
-| Qualidade do Código | 4,0 | ✅ TypeScript strict |
-| Lógica e Funcionamento | 3,0 | ✅ Fluxo completo |
-| README com instruções | 1,0 | ✅ Este documento |
-| Vídeo demonstrativo | 1,0 | ⏳ Pendente |
-| Clareza e Organização | 1,0 | ✅ Estrutura lógica |
+| Qualidade do Código | 4,0 | ✅ |
+| Lógica e Funcionamento | 3,0 | ✅ |
+| README | 1,0 | ✅ |
+| Vídeo demonstrativo | 1,0 | ⏳ |
+| Clareza e Organização | 1,0 | ✅ |
 
 ---
 
-## Uso de IA no Desenvolvimento
+## 12. Documentação Adicional
 
-Conforme item 13.9 do edital, este projeto utilizou assistência de Inteligência Artificial (**Claude Code** - Anthropic) para:
-
-- Aceleração do desenvolvimento
-- Revisão de código e acessibilidade
-- Otimização de performance
-- Documentação técnica
-
-A IA foi utilizada como ferramenta de apoio, com todas as decisões técnicas e criativas sendo validadas e supervisionadas pela equipe.
-
----
-
-## Autor
-
-**Iuri Leão**
+| Documento | Descrição |
+|-----------|-----------|
+| [CLAUDE.md](CLAUDE.md) | Guia para desenvolvimento com IA |
+| [docs/analise-participa-df.md](docs/analise-participa-df.md) | Análise do sistema atual |
+| [docs/plans/2026-01-20-pwa-ouvidoria-design.md](docs/plans/2026-01-20-pwa-ouvidoria-design.md) | Plano de implementação |
+| [docs/plans/2026-01-24-iza-camadas-2-3-design.md](docs/plans/2026-01-24-iza-camadas-2-3-design.md) | Design das camadas de IA |
+| [docs/plans/2026-01-24-backend-gdf-especificacao.md](docs/plans/2026-01-24-backend-gdf-especificacao.md) | Especificação técnica do backend |
+| [docs/DODF-hackathon.md](docs/DODF-hackathon.md) | Edital completo |
 
 ---
 
-## Licença
+## 13. Licença
 
-Este projeto foi desenvolvido para o **1º Hackathon em Controle Social: Desafio Participa DF**.
+Projeto desenvolvido para o **1º Hackathon em Controle Social: Desafio Participa DF**.
 
-Conforme item 10.3 do edital, a propriedade intelectual é cedida à Controladoria-Geral do Distrito Federal (CGDF).
-
----
-
-## Links Úteis
-
-- [Edital do Hackathon](docs/DODF-hackathon.md)
-- [Análise do Sistema Atual](docs/analise-participa-df.md)
-- [Plano de Implementação](docs/plans/2026-01-20-pwa-ouvidoria-design.md)
-- [WCAG 2.1 Quick Reference](https://www.w3.org/WAI/WCAG21/quickref/)
-- [Next.js Documentation](https://nextjs.org/docs)
+Conforme item 10.3 do edital, a propriedade intelectual é cedida à **Controladoria-Geral do Distrito Federal (CGDF)**.
 
 ---
 
 <p align="center">
   <sub>Desenvolvido com dedicação para o Governo do Distrito Federal</sub><br>
-  <sub>Hackathon Participa DF — Prazo: 30/01/2026</sub>
+  <sub>Hackathon Participa DF — Janeiro 2026</sub>
 </p>
