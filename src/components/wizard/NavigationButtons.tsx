@@ -38,12 +38,12 @@ export function NavigationButtons({
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-4 pt-6 border-t border-border",
+        "flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-border",
         className
       )}
     >
       {/* Botões do lado esquerdo */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-shrink-0">
         {/* Botão Voltar - Estilo Participa DF */}
         <Button
           type="button"
@@ -55,22 +55,23 @@ export function NavigationButtons({
             !podeVoltar && "invisible"
           )}
         >
-          <ChevronLeft className="h-4 w-4 mr-2" />
-          {textoVoltar}
+          <ChevronLeft className="h-4 w-4 mr-1 sm:mr-2" />
+          <span className="hidden sm:inline">{textoVoltar}</span>
+          <span className="sm:hidden">Voltar</span>
         </Button>
 
-        {/* Botão Recomeçar (opcional) */}
+        {/* Botão Recomeçar (opcional) - ícone apenas em mobile */}
         {onRecomecar && (
           <Button
             type="button"
             variant="ghost"
             onClick={onRecomecar}
             disabled={isSubmitting}
-            className="text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-2 sm:px-4"
             title="Limpar e recomeçar"
           >
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Recomeçar
+            <RotateCcw className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Recomeçar</span>
           </Button>
         )}
       </div>
@@ -81,17 +82,19 @@ export function NavigationButtons({
           type="button"
           onClick={onEnviar}
           disabled={!podeAvancar || isSubmitting}
-          className="bg-[#549250] hover:bg-[#3d7039] text-white"
+          className="bg-[#549250] hover:bg-[#3d7039] text-white flex-shrink-0"
         >
           {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Enviando...
+              <span className="hidden sm:inline">Enviando...</span>
+              <span className="sm:hidden">...</span>
             </>
           ) : (
             <>
-              <Send className="h-4 w-4 mr-2" />
-              Enviar Manifestação
+              <Send className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Enviar Manifestação</span>
+              <span className="sm:hidden">Enviar</span>
             </>
           )}
         </Button>
@@ -100,10 +103,11 @@ export function NavigationButtons({
           type="button"
           onClick={onAvancar}
           disabled={!podeAvancar || isSubmitting}
-          className="bg-[#549250] hover:bg-[#3d7039] text-white disabled:bg-gray-300 disabled:text-gray-500"
+          className="bg-[#549250] hover:bg-[#3d7039] text-white disabled:bg-gray-300 disabled:text-gray-500 flex-shrink-0"
         >
-          {textoAvancar}
-          <ChevronRight className="h-4 w-4 ml-2" />
+          <span className="hidden sm:inline">{textoAvancar}</span>
+          <span className="sm:hidden">{textoAvancar === "Confirmar" ? "Confirmar" : "Avançar"}</span>
+          <ChevronRight className="h-4 w-4 ml-1 sm:ml-2" />
         </Button>
       )}
     </div>

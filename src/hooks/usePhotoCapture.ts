@@ -206,6 +206,15 @@ export function usePhotoCapture(
 
     const video = videoRef.current;
 
+    // Verificar se o vídeo está pronto (importante para iOS)
+    if (video.readyState < 2 || video.videoWidth === 0 || video.videoHeight === 0) {
+      const errorMsg = "Aguarde a câmera carregar completamente.";
+      setError(errorMsg);
+      setStatus("error");
+      onError?.(new Error(errorMsg));
+      return;
+    }
+
     // Criar canvas se não existir
     if (!canvasRef.current) {
       canvasRef.current = document.createElement("canvas");
@@ -239,31 +248,38 @@ export function usePhotoCapture(
     // Desenhar frame do vídeo no canvas
     ctx.drawImage(video, 0, 0, width, height);
 
-    // Converter para blob
-    canvas.toBlob(
-      (capturedBlob) => {
-        if (capturedBlob) {
-          // Limpar URL anterior
-          if (url) {
-            URL.revokeObjectURL(url);
+    // Converter para blob - tentar PNG como fallback se JPEG falhar
+    const tryCapture = (imageFormat: string) => {
+      canvas.toBlob(
+        (capturedBlob) => {
+          if (capturedBlob) {
+            // Limpar URL anterior
+            if (url) {
+              URL.revokeObjectURL(url);
+            }
+
+            setBlob(capturedBlob);
+            setUrl(URL.createObjectURL(capturedBlob));
+            setStatus("captured");
+
+            // Parar stream após captura
+            cleanup();
+          } else if (imageFormat === format && format !== "image/png") {
+            // Tentar PNG como fallback
+            tryCapture("image/png");
+          } else {
+            const errorMsg = "Erro ao capturar a foto. Tente novamente.";
+            setError(errorMsg);
+            setStatus("error");
+            onError?.(new Error(errorMsg));
           }
+        },
+        imageFormat,
+        imageFormat === format ? quality : undefined
+      );
+    };
 
-          setBlob(capturedBlob);
-          setUrl(URL.createObjectURL(capturedBlob));
-          setStatus("captured");
-
-          // Parar stream após captura
-          cleanup();
-        } else {
-          const errorMsg = "Erro ao capturar a foto.";
-          setError(errorMsg);
-          setStatus("error");
-          onError?.(new Error(errorMsg));
-        }
-      },
-      format,
-      quality
-    );
+    tryCapture(format);
   }, [status, stream, maxWidth, maxHeight, format, quality, url, cleanup, onError]);
 
   // Trocar câmera
