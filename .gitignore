@@ -45,6 +45,9 @@ next-env.d.ts
 # Playwright MCP cache
 .playwright-mcp/
 
+# Internal documentation (not for evaluators)
+docs/
+
 # Debug
 .vercel
 *.pem

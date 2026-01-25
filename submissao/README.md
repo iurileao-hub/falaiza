@@ -209,7 +209,7 @@ A Camada 1 foi otimizada através de **metodologia de testes iterativos**:
 
 **Metodologia:** Gerar casos de teste → Executar → Analisar erros → Ajustar → Repetir
 
-Ver documentação técnica completa em [submissao/RELATORIO_IZA_INTELIGENTE.md](submissao/RELATORIO_IZA_INTELIGENTE.md)
+Ver documentação completa em [RELATORIO_IZA_INTELIGENTE.md](RELATORIO_IZA_INTELIGENTE.md).
 
 ### 3.3. Regras de Fallback
 
@@ -556,9 +556,9 @@ Todo código foi revisado e validado pelo autor, sendo de sua responsabilidade e
 
 | Documento | Descrição |
 |-----------|-----------|
-| [submissao/RESUMO_EXECUTIVO.md](submissao/RESUMO_EXECUTIVO.md) | Versão condensada para avaliadores |
-| [submissao/RELATORIO_IZA_INTELIGENTE.md](submissao/RELATORIO_IZA_INTELIGENTE.md) | Análise técnica do sistema de classificação |
-| [CLAUDE.md](CLAUDE.md) | Guia para desenvolvimento com IA |
+| [RESUMO_EXECUTIVO.md](RESUMO_EXECUTIVO.md) | Versão condensada para avaliadores |
+| [RELATORIO_IZA_INTELIGENTE.md](RELATORIO_IZA_INTELIGENTE.md) | Análise técnica do sistema de classificação |
+| [CLAUDE.md](../CLAUDE.md) | Guia para desenvolvimento com IA |
 
 ---
 
