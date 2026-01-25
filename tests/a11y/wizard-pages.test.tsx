@@ -52,13 +52,14 @@ jest.mock('@/stores/manifestacaoStore', () => ({
       },
     ],
     classificacao: {
-      tipo: { id: 'reclamacao', nome: 'Reclamacao', confianca: 0.85 },
-      orgao: { id: 'saude', nome: 'Secretaria de Saude', confianca: 0.78 },
-      entidades: [],
+      tipo: { id: 'reclamacao', confianca: 0.85 },
+      orgao: { id: 'saude', confianca: 0.78 },
+      entidades: { locais: [], datas: [], orgaosMencionados: [] },
+      resumo: '',
       meta: {
+        fonte: 'regras',
+        processadoEm: new Date(),
         tempoProcessamento: 150,
-        camadaUtilizada: 1,
-        modeloVersao: '1.0',
         editadoPeloUsuario: false,
       },
     },
@@ -89,10 +90,11 @@ jest.mock('@/stores/manifestacaoStore', () => ({
 jest.mock('@/hooks/useClassificacao', () => ({
   useClassificacao: () => ({
     classificar: jest.fn().mockResolvedValue({
-      tipo: { id: 'reclamacao', nome: 'Reclamacao', confianca: 0.85 },
-      orgao: { id: 'saude', nome: 'Secretaria de Saude', confianca: 0.78 },
-      entidades: [],
-      meta: { tempoProcessamento: 100, camadaUtilizada: 1 },
+      tipo: { id: 'reclamacao', confianca: 0.85 },
+      orgao: { id: 'saude', confianca: 0.78 },
+      entidades: { locais: [], datas: [], orgaosMencionados: [] },
+      resumo: '',
+      meta: { fonte: 'regras', processadoEm: new Date(), tempoProcessamento: 100, editadoPeloUsuario: false },
     }),
     isLoading: false,
     error: null,
