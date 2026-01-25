@@ -67,7 +67,7 @@
       "name": "Nova Manifestação",
       "short_name": "Nova",
       "description": "Iniciar uma nova manifestação",
-      "url": "/manifestacao/tipo",
+      "url": "/manifestacao/relato",
       "icons": [
         {
           "src": "/icons/shortcut-new.png",

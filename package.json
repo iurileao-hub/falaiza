@@ -10,7 +10,6 @@
     "test:a11y": "jest tests/a11y"
   },
   "dependencies": {
-    "@huggingface/transformers": "^3.8.1",
     "@radix-ui/react-checkbox": "^1.1.3",
     "@radix-ui/react-dialog": "^1.1.3",
     "@radix-ui/react-label": "^2.1.1",

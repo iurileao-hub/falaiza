@@ -50,11 +50,8 @@ async function classificarComBackendGDF(
 ): Promise<ClassificacaoResultado | null> {
   // Verificar se está online
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
-    console.log('[IZA] Sem conexão - Backend GDF indisponível');
     return null;
   }
-
-  console.log('[IZA] Classificando via Backend GDF (mock)...');
   onProgress?.(0.3);
 
   try {
@@ -86,8 +83,7 @@ async function classificarComBackendGDF(
       },
     };
 
-  } catch (error) {
-    console.warn('[IZA] Erro no Backend GDF:', error);
+  } catch {
     onProgress?.(1);
     return null;
   }
@@ -139,8 +135,8 @@ export async function classificar(
         onProgress?.(1);
         return mergeResultados(resultadoBackend, resultadoRegras);
       }
-    } catch (error) {
-      console.warn('[IZA] Erro no backend GDF, usando fallback:', error);
+    } catch {
+      // Silently fallback to rules engine
     }
   }
 
