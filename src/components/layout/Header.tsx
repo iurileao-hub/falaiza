@@ -31,9 +31,9 @@ export function Header() {
               <Image
                 src="/assets/logos/logo-gdf-branca.png"
                 alt="GDF - Governo do Distrito Federal"
-                width={60}
-                height={60}
-                className="h-12 w-auto"
+                width={48}
+                height={48}
+                style={{ width: 'auto', height: 'auto' }}
                 priority
               />
             </Link>
@@ -45,9 +45,9 @@ export function Header() {
               <Image
                 src="/assets/logos/participadf-branca.svg"
                 alt="Participa DF"
-                width={280}
-                height={45}
-                className="h-10 md:h-12 w-auto"
+                width={240}
+                height={40}
+                style={{ width: 'auto', height: 'auto' }}
                 priority
               />
             </Link>

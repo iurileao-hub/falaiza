@@ -23,6 +23,7 @@ export default function SugestaoPage() {
     etapaAtual,
     podeAvancar,
     irParaEtapa,
+    resetar,
   } = useManifestacaoStore();
 
   // Redirecionar se não tiver relato
@@ -44,6 +45,16 @@ export default function SugestaoPage() {
     router.push("/manifestacao/relato");
   };
 
+  const handleRecomecar = () => {
+    const confirmado = window.confirm(
+      "Tem certeza que deseja recomeçar? Seu relato atual será apagado."
+    );
+    if (confirmado) {
+      resetar();
+      router.push("/manifestacao/relato");
+    }
+  };
+
   return (
     <WizardLayout etapaAtual={etapaAtual}>
       {/* Componente principal de sugestão */}
@@ -57,6 +68,7 @@ export default function SugestaoPage() {
         podeVoltar={true}
         onVoltar={handleVoltar}
         onAvancar={handleAvancar}
+        onRecomecar={handleRecomecar}
         textoAvancar={classificacao?.meta.editadoPeloUsuario ? "Continuar" : "Confirmar"}
         className="mt-8"
       />

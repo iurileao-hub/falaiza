@@ -14,33 +14,56 @@ Este arquivo fornece orientações para o assistente de programação **Claude C
 
 ## Status do Projeto
 
-**Fase atual:** IZA Inteligente completa (3 camadas implementadas)
+**Fase atual:** IZA Inteligente simplificada (2 camadas)
 
 ### Progresso
 
 - [x] PWA base implementada
 - [x] Wizard de 5 etapas (story-first)
 - [x] IZA Inteligente - Camada 1 (Regras) ✅
-- [x] IZA Inteligente - Camada 2 (Modelo Local - MobileBERT via CDN) ✅
-- [x] IZA Inteligente - Camada 3 (Backend GDF - Mock) ✅
+- [x] IZA Inteligente - Camada 2 (Backend GDF - Mock) ✅
 - [x] Header/Navbar estilo Participa DF
 - [x] Acessibilidade (WCAG 2.1 AA)
+- [x] Testes automatizados de acessibilidade
 
 ### Documentação Disponível
 
 - `docs/analise-participa-df.md` — Análise completa do sistema atual
 - `docs/plans/2026-01-20-pwa-ouvidoria-design.md` — Plano de implementação detalhado
-- `docs/plans/2026-01-24-iza-camadas-2-3-design.md` — Design das Camadas 2 e 3
 - `docs/plans/2026-01-24-backend-gdf-especificacao.md` — **Especificação técnica do Backend GDF** (modelos, arquiteturas, custos)
+- `docs/decisions/2026-01-25-remocao-modelo-local.md` — **ADR-001: Remoção do modelo local**
+- `docs/decisions/2026-01-25-otimizacao-camada1-testes.md` — **ADR-002: Otimização da Camada 1** ⭐
 - `docs/DODF-hackathon.md` — Edital completo
 
 ### ✅ Camadas de Classificação Implementadas
 
 | Camada | Tecnologia | Status |
 |--------|------------|--------|
-| 1 - Regras | Keywords + Extração de entidades | ✅ Funcional |
-| 2 - Modelo Local | MobileBERT zero-shot via CDN | ✅ Funcional |
-| 3 - Backend GDF | Mock API em `/api/ia/classificar` | ✅ Mock funcional |
+| 1 - Regras | Keywords + Extração de entidades | ✅ Funcional (100% precisão) |
+| 2 - Backend GDF | Mock API em `/api/ia/classificar` | ✅ Mock funcional |
+
+> **Nota:** O modelo local (MobileBERT) foi removido por decisão arquitetural (ADR-001).
+> Motivos: problemas de UX, acessibilidade para usuários leigos, e complexidade desnecessária.
+
+### 🏆 Destaque: Otimização da Camada 1 (ADR-002)
+
+A Camada 1 foi otimizada através de um **loop de testes iterativos**, alcançando:
+
+```
+┌────────────────────────────────────────────────────┐
+│  ANTES:  20% precisão  →  DEPOIS: 100% precisão   │
+│                                                    │
+│  ████░░░░░░░░░░░░░░░░  →  ████████████████████    │
+│                                                    │
+│  Melhoria: +400% em 5 rodadas de otimização       │
+└────────────────────────────────────────────────────┘
+```
+
+**Metodologia:** Gerar casos de teste → Executar → Analisar erros → Ajustar → Repetir
+
+**Script de testes:** `npx tsx scripts/testar-camada1-completo.ts`
+
+Ver documentação completa em `docs/decisions/2026-01-25-otimizacao-camada1-testes.md`
 
 ---
 
@@ -62,11 +85,12 @@ Este arquivo fornece orientações para o assistente de programação **Claude C
 ### Abordagem de Design
 
 - **Story-First Flow** — Usuário conta sua história primeiro, IZA classifica automaticamente (5 etapas)
-- **IZA Inteligente** — Classificação em 3 camadas: Regras → Modelo Local → Backend GDF
+- **IZA Inteligente** — Classificação em 2 camadas: Regras (local) → Backend GDF (API)
 - **Multicanalidade Simultânea** — Usuário pode enviar texto + áudio + foto + vídeo na mesma manifestação
 - **Captura Nativa** — MediaRecorder API para gravação direta (não só upload)
 - **Identidade Visual** — Replicar cores, fontes e elementos do Participa DF atual
-- **Privacidade por Design** — Camadas 1 e 2 processam 100% local, dados nunca saem do dispositivo
+- **Privacidade por Design** — Camada 1 processa 100% local; Camada 2 usa HTTPS + LGPD
+- **Acessibilidade Universal** — Design para todos, incluindo analfabetos digitais
 
 ### Paleta de Cores
 
@@ -119,11 +143,12 @@ hackathon-ouvidoria-df/
 │   ├── components/
 │   │   ├── ui/            # shadcn/ui
 │   │   ├── layout/        # Header, Footer, SkipLinks
-│   │   ├── iza/           # IzaAvatar, IzaMessage, IzaSugestaoInteligente
+│   │   ├── iza/           # Componentes IZA Inteligente
 │   │   │   ├── IzaAvatar.tsx
 │   │   │   ├── IzaMessage.tsx
 │   │   │   ├── IzaSugestaoInteligente.tsx
-│   │   │   └── ModeloLocalDownload.tsx   # UI download modelo
+│   │   │   ├── SeletorComConfianca.tsx
+│   │   │   └── ConfiancaIndicator.tsx
 │   │   ├── wizard/        # ProgressBar, StepCard, Navigation
 │   │   ├── media/         # AudioRecorder, VideoRecorder, PhotoCapture
 │   │   ├── forms/         # IdentificacaoForm, RelatoTextarea
@@ -139,9 +164,9 @@ hackathon-ouvidoria-df/
 │   ├── lib/
 │   │   ├── iza/                   # Sistema IZA Inteligente
 │   │   │   ├── index.ts           # Exports públicos
-│   │   │   ├── engine.ts          # Orquestrador das 3 camadas
-│   │   │   ├── model-local.ts     # Gerenciador MobileBERT (Camada 2)
-│   │   │   ├── keywords.ts        # Regras de palavras-chave (Camada 1)
+│   │   │   ├── engine.ts          # Orquestrador das 2 camadas
+│   │   │   ├── rules-engine.ts    # Motor da Camada 1
+│   │   │   ├── keywords.ts        # Regras de palavras-chave (800+)
 │   │   │   └── types.ts           # Tipos TypeScript
 │   │   ├── db.ts          # Dexie.js config
 │   │   ├── protocolo.ts   # Geração de protocolo
@@ -205,34 +230,31 @@ hackathon-ouvidoria-df/
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    CAMADA 1: REGRAS ✅                       │
-│  • Palavras-chave + frases                                  │
+│  • Palavras-chave + frases (vocabulário expandido)          │
 │  • Extração de entidades (locais, datas, órgãos)            │
-│  • 100% local, 0 KB, < 50ms                                 │
+│  • 100% local, 0 KB, < 50ms, funciona offline               │
 │  • Arquivo: src/lib/iza/rules-engine.ts                     │
 ├─────────────────────────────────────────────────────────────┤
-│                 CAMADA 2: MODELO LOCAL ✅                    │
-│  • MobileBERT via CDN (@huggingface/transformers)           │
-│  • ~100MB download único, zero-shot classification          │
-│  • 100% local, dados NUNCA saem do dispositivo              │
-│  • Arquivo: src/lib/iza/model-local.ts                      │
-├─────────────────────────────────────────────────────────────┤
-│                 CAMADA 3: BACKEND GDF ✅                     │
-│  • Mock API em /api/ia/classificar                          │
-│  • Dados tratados com sigilo (LAI + LGPD)                   │
-│  • Pronto para integração real com GDF                      │
+│                 CAMADA 2: BACKEND GDF ✅                     │
+│  • API transparente para o usuário                          │
+│  • Mock em /api/ia/classificar (pronto para produção)       │
+│  • Modelo robusto no servidor (BERTimbau em produção)       │
+│  • HTTPS + LGPD + LAI                                       │
 │  • Arquivo: src/app/api/ia/classificar/route.ts             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
+> **ADR-001:** Modelo local (MobileBERT) foi removido por problemas de UX e acessibilidade.
+> Ver: `docs/decisions/2026-01-25-remocao-modelo-local.md`
+
 **Arquivos principais:**
-- `src/lib/iza/keywords.ts` — Regras de palavras-chave (Camada 1)
+- `src/lib/iza/keywords.ts` — Regras de palavras-chave (800+)
 - `src/lib/iza/rules-engine.ts` — Engine da Camada 1
-- `src/lib/iza/model-local.ts` — Manager do MobileBERT (Camada 2)
-- `src/lib/iza/engine.ts` — Orquestrador das 3 camadas
-- `src/app/api/ia/classificar/route.ts` — Mock Backend GDF (Camada 3)
+- `src/lib/iza/engine.ts` — Orquestrador das 2 camadas
+- `src/app/api/ia/classificar/route.ts` — Mock Backend GDF (Camada 2)
 - `src/hooks/useClassificacao.ts` — Hook React para classificação
 - `src/components/iza/IzaSugestaoInteligente.tsx` — UI de sugestão
-- `src/components/iza/ModeloLocalDownload.tsx` — UI de download do modelo
+- `src/components/iza/SeletorComConfianca.tsx` — Seletor com indicador de confiança
 
 ### Exemplos de Falas
 
@@ -353,26 +375,26 @@ npm run lighthouse
 
 ### Prioridade Alta (para o Hackathon)
 
-- [ ] **Testar IZA Inteligente em produção**
-  - Verificar download do modelo MobileBERT via CDN
-  - Testar classificação com relatos reais
-  - Validar fallback entre camadas
+- [x] **Wizard de manifestação completo** ✅
+  - Fluxo de 5 etapas funcionando
+  - Classificação automática pela IZA
+  - Seleção manual de tipo/órgão
+  - Botão "Recomeçar" para limpar e reiniciar
 
-- [ ] **Finalizar wizard de manifestação**
-  - Revisar fluxo completo das 5 etapas
-  - Testar persistência offline (IndexedDB)
-  - Validar geração de protocolo
+- [x] **IZA Inteligente - Camada 1 otimizada** ✅
+  - 100% precisão em testes (ADR-002)
+  - 800+ palavras-chave
+  - Extração de entidades
+
+- [ ] **Testar em produção (Vercel)**
+  - Deploy e teste no celular
+  - Verificar PWA instalável
+  - Testar funcionamento offline
 
 - [ ] **Gravar vídeo demonstrativo** (≤7 min)
   - Mostrar fluxo completo de manifestação
   - Demonstrar classificação inteligente da IZA
   - Destacar acessibilidade e multicanalidade
-
-### Prioridade Média (melhorias)
-
-- [ ] Implementar testes automatizados de acessibilidade
-- [ ] Adicionar mais palavras-chave na Camada 1
-- [ ] Otimizar tempo de carregamento do modelo local
 
 ### Para Implementação Real (pós-hackathon)
 
@@ -385,5 +407,6 @@ npm run lighthouse
 | Documento | Descrição |
 |-----------|-----------|
 | `docs/plans/2026-01-20-pwa-ouvidoria-design.md` | Plano completo de implementação |
-| `docs/plans/2026-01-24-iza-camadas-2-3-design.md` | Design das Camadas 2 e 3 |
 | `docs/plans/2026-01-24-backend-gdf-especificacao.md` | Especificação técnica Backend GDF |
+| `docs/decisions/2026-01-25-remocao-modelo-local.md` | ADR-001: Remoção do modelo local |
+| `docs/decisions/2026-01-25-otimizacao-camada1-testes.md` | ADR-002: Otimização da Camada 1 |

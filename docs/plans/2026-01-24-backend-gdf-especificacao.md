@@ -85,6 +85,129 @@ Para classificação por similaridade ou busca em base de conhecimento:
 - Detecção de duplicatas
 - Classificação por similaridade com exemplos
 
+### 1.4 Modelos Multimodais (Recomendado para Multicanalidade)
+
+A PWA Ouvidoria permite que cidadãos enviem manifestações em múltiplos formatos (texto, áudio, vídeo, foto). Para maximizar a acessibilidade e atender usuários que preferem comunicação oral ou visual, recomenda-se fortemente o uso de modelos multimodais.
+
+#### Por que Multimodal?
+
+| Cenário | Problema | Solução Multimodal |
+|---------|----------|-------------------|
+| Usuário envia áudio | Texto vazio, classificação impossível | Transcrição + análise de sentimento |
+| Usuário envia foto de documento | Imagem sem contexto textual | OCR + extração de entidades |
+| Usuário envia vídeo de reclamação | Conteúdo rico não processado | Transcrição de fala + análise visual |
+| Usuário com baixa alfabetização | Dificuldade em escrever | Preferência por áudio/vídeo |
+
+#### Modelos Multimodais Recomendados
+
+| Modelo | Modalidades | Uso Recomendado | Licença |
+|--------|-------------|-----------------|---------|
+| **GPT-4o** (OpenAI) | Texto, Imagem, Áudio | Classificação completa, alta precisão | Comercial |
+| **Gemini 1.5 Pro** (Google) | Texto, Imagem, Áudio, Vídeo | Análise de vídeo longo, multimodal nativo | Comercial |
+| **Claude 3.5 Sonnet** (Anthropic) | Texto, Imagem | Análise de documentos, fotos | Comercial |
+| **LLaVA** (Open Source) | Texto, Imagem | Self-hosted, controle total | Apache 2.0 |
+| **Whisper** (OpenAI) | Áudio → Texto | Transcrição de áudio/vídeo | MIT |
+
+#### Arquitetura Multimodal Proposta
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                  PROCESSAMENTO MULTIMODAL                           │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   Manifestação (texto + áudio + foto + vídeo)                       │
+│                           │                                         │
+│          ┌────────────────┼────────────────┐                        │
+│          ▼                ▼                ▼                        │
+│   ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                 │
+│   │   TEXTO     │  │   ÁUDIO     │  │   IMAGEM    │                 │
+│   │ (direto)    │  │  (Whisper)  │  │  (OCR/VLM)  │                 │
+│   └──────┬──────┘  └──────┬──────┘  └──────┬──────┘                 │
+│          │                │                │                        │
+│          └────────────────┼────────────────┘                        │
+│                           ▼                                         │
+│                  ┌─────────────────┐                                │
+│                  │   TEXTO UNIFICADO   │                            │
+│                  │  (concatenação)     │                            │
+│                  └──────────┬──────────┘                            │
+│                             ▼                                       │
+│                  ┌─────────────────┐                                │
+│                  │   CLASSIFICAÇÃO  │                               │
+│                  │   (BERTimbau)    │                               │
+│                  └─────────────────┘                                │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### Whisper para Transcrição de Áudio
+
+```python
+import whisper
+
+# Modelo recomendado para português
+model = whisper.load_model("large-v3")
+
+def transcrever_audio(audio_path: str) -> str:
+    result = model.transcribe(
+        audio_path,
+        language="pt",
+        task="transcribe"
+    )
+    return result["text"]
+```
+
+| Modelo Whisper | Parâmetros | Precisão PT-BR | VRAM |
+|----------------|------------|----------------|------|
+| `tiny` | 39M | Baixa | 1GB |
+| `base` | 74M | Média | 1GB |
+| `small` | 244M | Boa | 2GB |
+| `medium` | 769M | Muito boa | 5GB |
+| `large-v3` | 1.5B | Excelente | 10GB |
+
+#### Análise de Imagens
+
+Para fotos de documentos, recibos, ou situações:
+
+```python
+# Opção 1: API multimodal (GPT-4o, Gemini, Claude)
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "Analise esta imagem e extraia informações relevantes para uma manifestação de ouvidoria:"},
+                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
+            ]
+        }
+    ]
+)
+
+# Opção 2: Self-hosted com LLaVA
+from transformers import LlavaForConditionalGeneration, AutoProcessor
+
+model = LlavaForConditionalGeneration.from_pretrained("llava-hf/llava-1.5-7b-hf")
+processor = AutoProcessor.from_pretrained("llava-hf/llava-1.5-7b-hf")
+```
+
+#### Estimativa de Custos para Multimodal
+
+| Serviço | Modalidade | Custo Estimado |
+|---------|------------|----------------|
+| GPT-4o | Texto + Imagem | ~$0.01 por manifestação |
+| Gemini 1.5 Pro | Texto + Imagem + Áudio | ~$0.007 por manifestação |
+| Whisper API | Áudio (5 min) | ~$0.03 por áudio |
+| Self-hosted (LLaVA + Whisper) | Todas | Custo de infraestrutura |
+
+#### Recomendação Final para GDF
+
+Para um serviço público acessível a todos os cidadãos, incluindo aqueles com baixa alfabetização digital:
+
+1. **Transcrição obrigatória**: Todo áudio/vídeo deve ser transcrito automaticamente
+2. **OCR em fotos**: Documentos e recibos devem ser processados
+3. **Fallback robusto**: Se multimodal falhar, classificar apenas o texto disponível
+4. **Sem interação extra**: Processamento 100% automático, sem perguntas ao usuário
+
 ---
 
 ## 2. Arquiteturas de Backend

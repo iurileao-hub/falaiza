@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Send, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Send, Loader2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,7 @@ interface NavigationButtonsProps {
   onVoltar: () => void;
   onAvancar: () => void;
   onEnviar?: () => void;
+  onRecomecar?: () => void;
   textoAvancar?: string;
   textoVoltar?: string;
   className?: string;
@@ -27,6 +28,7 @@ export function NavigationButtons({
   onVoltar,
   onAvancar,
   onEnviar,
+  onRecomecar,
   textoAvancar = "Avançar",
   textoVoltar = "Voltar",
   className,
@@ -40,20 +42,38 @@ export function NavigationButtons({
         className
       )}
     >
-      {/* Botão Voltar - Estilo Participa DF */}
-      <Button
-        type="button"
-        variant="outline"
-        onClick={onVoltar}
-        disabled={!podeVoltar || isSubmitting}
-        className={cn(
-          "bg-[#28477D] text-white border-[#28477D] hover:bg-[#1E3A5F] hover:border-[#1E3A5F] hover:text-white",
-          !podeVoltar && "invisible"
+      {/* Botões do lado esquerdo */}
+      <div className="flex items-center gap-2">
+        {/* Botão Voltar - Estilo Participa DF */}
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onVoltar}
+          disabled={!podeVoltar || isSubmitting}
+          className={cn(
+            "bg-[#28477D] text-white border-[#28477D] hover:bg-[#1E3A5F] hover:border-[#1E3A5F] hover:text-white",
+            !podeVoltar && "invisible"
+          )}
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          {textoVoltar}
+        </Button>
+
+        {/* Botão Recomeçar (opcional) */}
+        {onRecomecar && (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onRecomecar}
+            disabled={isSubmitting}
+            className="text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            title="Limpar e recomeçar"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Recomeçar
+          </Button>
         )}
-      >
-        <ChevronLeft className="h-4 w-4 mr-2" />
-        {textoVoltar}
-      </Button>
+      </div>
 
       {/* Botão Avançar ou Enviar - Estilo Participa DF (Verde) */}
       {isUltimaEtapa ? (

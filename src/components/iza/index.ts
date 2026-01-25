@@ -23,9 +23,3 @@ export {
   PrivacidadeIndicator,
   PrivacidadeBadge,
 } from './PrivacidadeIndicator';
-
-// Componentes do modelo local (Camada 2)
-export {
-  ModeloLocalDownload,
-  ModeloLocalBadge,
-} from './ModeloLocalDownload';

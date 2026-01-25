@@ -7,6 +7,7 @@ import { WizardLayout } from "@/components/wizard/WizardLayout";
 import { NavigationButtons } from "@/components/wizard/NavigationButtons";
 import { IzaContainer } from "@/components/iza/IzaContainer";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { MediaToolbar } from "@/components/media/MediaToolbar";
 import { MediaPreview } from "@/components/media/MediaPreview";
 import { useManifestacaoStore } from "@/stores/manifestacaoStore";
@@ -170,8 +171,11 @@ export default function RelatoPage() {
 
       {/* Área de relato */}
       <div className="space-y-4">
-        {/* Textarea */}
+        {/* Textarea com label acessível */}
         <div className="space-y-2">
+          <Label htmlFor="relato" className="sr-only">
+            Descreva sua manifestação
+          </Label>
           <Textarea
             id="relato"
             placeholder="Descreva sua manifestação aqui. Seja o mais detalhado possível para que possamos ajudá-lo melhor..."
@@ -218,7 +222,7 @@ export default function RelatoPage() {
           disabled={tamanhoTotal >= tamanhoMaximo}
         />
 
-        {/* Input de arquivo hidden */}
+        {/* Input de arquivo hidden - acessível para tecnologias assistivas */}
         {showFileInput && (
           <input
             type="file"
@@ -227,6 +231,7 @@ export default function RelatoPage() {
             onChange={handleFileInputChange}
             className="hidden"
             ref={(input) => input?.click()}
+            aria-label="Selecionar arquivos para anexar"
           />
         )}
 

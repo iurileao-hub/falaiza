@@ -5,7 +5,13 @@
  * de uma API real do GDF para classificação inteligente.
  *
  * Em produção, esta rota seria substituída por uma integração real
- * com os sistemas de IA do Governo do Distrito Federal.
+ * com os sistemas de IA do Governo do Distrito Federal, incluindo:
+ * - Modelo de classificação (BERTimbau ou similar)
+ * - Transcrição de áudio/vídeo (Whisper)
+ * - Análise de imagens (GPT-4o, Gemini, ou LLaVA)
+ *
+ * MULTIMODAL: A arquitetura suporta texto + áudio + vídeo + imagem.
+ * Ver: docs/plans/2026-01-24-backend-gdf-especificacao.md
  *
  * SIGILO: Os dados recebidos são tratados com sigilo.
  * Nenhum dado é armazenado permanentemente neste mock.
@@ -125,6 +131,21 @@ export async function GET(): Promise<NextResponse> {
           meta: '{ fonte: "backend_gdf", tempoProcessamento: number, sigiloso: true }',
         },
       },
+    },
+    multimodal: {
+      status: 'planejado',
+      descricao: 'Em produção, a API suportará análise multimodal',
+      capacidades: [
+        'Transcrição automática de áudio (Whisper)',
+        'Transcrição de vídeo',
+        'OCR e análise de imagens/documentos',
+        'Classificação unificada de todas as modalidades',
+      ],
+      beneficios: [
+        'Acessibilidade para usuários que preferem áudio/vídeo',
+        'Extração de informações de documentos fotografados',
+        'Análise de contexto visual em reclamações',
+      ],
     },
     privacidade: {
       sigiloso: true,

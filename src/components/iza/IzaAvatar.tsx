@@ -39,6 +39,7 @@ export function IzaAvatar({
         src={imageSrc}
         alt=""
         fill
+        sizes="(max-width: 768px) 64px, 96px"
         className="object-contain"
         priority
       />

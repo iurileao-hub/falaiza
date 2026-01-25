@@ -73,7 +73,6 @@ export function useClassificacao(): UseClassificacaoReturn {
         const config = getConfigIA();
 
         const result = await classificar(relato, {
-          usarModeloLocal: opcoes.usarModeloLocal ?? config.usarModeloLocal,
           usarBackendGDF: opcoes.usarBackendGDF ?? config.usarBackendGDF,
           onProgress: (p) => setProgresso(p),
         });

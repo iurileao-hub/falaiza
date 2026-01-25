@@ -6,22 +6,18 @@
 
 'use client';
 
-import { useEffect, useMemo, useCallback, useState } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { IzaMessage } from './IzaMessage';
 import { SeletorComConfianca } from './SeletorComConfianca';
-import { PrivacidadeIndicator, PrivacidadeBadge } from './PrivacidadeIndicator';
-import { ConfiancaIndicator, getNivelConfianca } from './ConfiancaIndicator';
-import { ModeloLocalDownload } from './ModeloLocalDownload';
+import { getNivelConfianca } from './ConfiancaIndicator';
 import { useClassificacao } from '@/hooks/useClassificacao';
 import { useManifestacaoStore } from '@/stores/manifestacaoStore';
 import {
-  TIPOS_MANIFESTACAO,
   getTipoMeta,
   getOrgaoMeta,
   ORGAOS,
   artigoTipo,
-  modeloLocalPronto,
   type ClassificacaoResultado,
 } from '@/lib/iza';
 import { TIPOS_MANIFESTACAO as TIPOS_CONFIG } from '@/lib/constants';
@@ -113,10 +109,10 @@ export function IzaSugestaoInteligente({ className }: IzaSugestaoInteligenteProp
 
   // Opções de órgão formatadas para o seletor
   const opcoesOrgao = useMemo(() => {
-    return Object.entries(ORGAOS).map(([id, meta]) => ({
-      id,
-      nome: meta.nome,
-      icone: meta.icone,
+    return ORGAOS.map((orgao) => ({
+      id: orgao.id,
+      nome: orgao.nome,
+      icone: orgao.icone,
     }));
   }, []);
 
@@ -167,26 +163,6 @@ export function IzaSugestaoInteligente({ className }: IzaSugestaoInteligenteProp
   );
 
   const mensagemIza = montarMensagemIza(resultadoAtual, status);
-
-  // Verificar se deve oferecer download do modelo
-  const [modeloPronto, setModeloPronto] = useState(modeloLocalPronto());
-  const deveOferecerDownload = useMemo(() => {
-    if (modeloPronto) return false;
-    if (!resultadoAtual) return false;
-    // Oferecer se confiança for menor que 70%
-    return resultadoAtual.tipo.confianca < 0.7 || resultadoAtual.orgao.confianca < 0.7;
-  }, [modeloPronto, resultadoAtual]);
-
-  // Handler quando modelo ficar pronto - reclassificar
-  const handleModeloReady = useCallback(() => {
-    setModeloPronto(true);
-    // Reclassificar com o modelo local
-    if (manifestacao.relato && manifestacao.relato.length >= 20) {
-      classificar(manifestacao.relato).then((result) => {
-        setClassificacao(result);
-      });
-    }
-  }, [manifestacao.relato, classificar, setClassificacao]);
 
   return (
     <div className={cn('space-y-6', className)}>
@@ -291,21 +267,6 @@ export function IzaSugestaoInteligente({ className }: IzaSugestaoInteligenteProp
                 ))}
               </div>
             </div>
-          )}
-
-          {/* Indicador de privacidade */}
-          <PrivacidadeIndicator
-            camada={resultadoAtual.meta.fonte}
-            tempoMs={resultadoAtual.meta.tempoProcessamento}
-            expandido
-          />
-
-          {/* Oferta de download do modelo local */}
-          {deveOferecerDownload && (
-            <ModeloLocalDownload
-              onModeloReady={handleModeloReady}
-              className="mt-4"
-            />
           )}
 
           {/* Confirmação visual */}

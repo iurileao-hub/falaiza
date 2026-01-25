@@ -25,9 +25,9 @@ export function WizardLayout({
             <Image
               src="/assets/logos/Logo-OUV.svg"
               alt="Ouvidoria do Governo do Distrito Federal"
-              width={300}
-              height={180}
-              className="h-auto w-full max-w-[200px] md:max-w-[280px]"
+              width={280}
+              height={168}
+              style={{ width: 'auto', height: 'auto' }}
               priority
             />
 

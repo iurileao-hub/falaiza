@@ -4,10 +4,11 @@
  * Este módulo implementa um sistema de classificação automática
  * de manifestações com foco em privacidade do cidadão.
  *
- * Arquitetura de 3 Camadas:
+ * Arquitetura de 2 Camadas:
  * - Camada 1 (Regras): 100% local, instantâneo, sempre disponível
- * - Camada 2 (Modelo Local): IA no browser via Transformers.js
- * - Camada 3 (Backend GDF): Especificação para implementação futura
+ * - Camada 2 (Backend GDF): API transparente, modelo robusto no servidor
+ *
+ * Decisão arquitetural: ADR-001 (docs/decisions/2026-01-25-remocao-modelo-local.md)
  *
  * @example
  * ```typescript
@@ -26,19 +27,10 @@ export {
   classificarPorRegras,
   classificacaoConfiavel,
   nivelConfianca,
-  modeloLocalPronto,
-  baixarModelo,
-  getInfoModeloLocal,
   getConfigIA,
   setConfigIA,
   resetConfigIA,
   getCamadaAtiva,
-  // Re-exports do model-local
-  TAMANHO_MODELO_MB,
-  getStatusModelo,
-  getProgressoDownload,
-  onStatusChange,
-  descarregarModelo,
 } from './engine';
 
 // Tipos
@@ -53,10 +45,6 @@ export type {
   OpcoesClassificacao,
   EstadoClassificacao,
   AcoesClassificacao,
-  StatusModeloLocal,
-  ProgressoDownload,
-  TipoConsentimento,
-  StatusConsentimento,
 } from './types';
 
 // Metadados e helpers

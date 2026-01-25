@@ -1,6 +1,12 @@
 /**
  * Tipos TypeScript para a IZA Inteligente
  * Sistema de classificação automática de manifestações com privacidade
+ *
+ * Arquitetura de 2 Camadas:
+ * - Camada 1 (Regras): 100% local, instantâneo
+ * - Camada 2 (Backend GDF): API transparente
+ *
+ * Decisão arquitetural: ADR-001 (docs/decisions/2026-01-25-remocao-modelo-local.md)
  */
 
 // ============================================================================
@@ -98,31 +104,21 @@ export type OrgaoId =
  * Camadas de classificação disponíveis
  */
 export type CamadaClassificacao =
-  | 'regras'        // Camada 1: Classificação por palavras-chave
-  | 'modelo_local'  // Camada 2: Modelo Transformers.js no browser
-  | 'backend_gdf';  // Camada 3: API do GDF (futuro)
+  | 'regras'       // Camada 1: Classificação por palavras-chave (local)
+  | 'backend_gdf'; // Camada 2: API do GDF (servidor)
 
 // ============================================================================
 // Configuração de IA
 // ============================================================================
 
 /**
- * Configuração das preferências de IA do usuário
+ * Configuração das preferências de IA
  */
 export interface ConfiguracaoIA {
-  /** Se o modelo local está disponível para download */
-  modeloLocalDisponivel: boolean;
-
-  /** Se o modelo local já foi baixado */
-  modeloLocalBaixado: boolean;
-
-  /** Se o usuário optou por usar o modelo local */
-  usarModeloLocal: boolean;
-
   /** Se o backend GDF está disponível */
   backendGDFDisponivel: boolean;
 
-  /** Se o usuário autorizou uso do backend GDF */
+  /** Se deve usar o backend GDF quando disponível */
   usarBackendGDF: boolean;
 }
 
@@ -130,9 +126,6 @@ export interface ConfiguracaoIA {
  * Opções para o processo de classificação
  */
 export interface OpcoesClassificacao {
-  /** Usar modelo local se disponível */
-  usarModeloLocal?: boolean;
-
   /** Usar backend GDF se disponível */
   usarBackendGDF?: boolean;
 
@@ -198,37 +191,6 @@ export interface ExtratoresEntidades {
 }
 
 // ============================================================================
-// Modelo Local (Transformers.js)
-// ============================================================================
-
-/**
- * Status do modelo local
- */
-export type StatusModeloLocal =
-  | 'nao_disponivel'
-  | 'disponivel'
-  | 'baixando'
-  | 'pronto'
-  | 'erro';
-
-/**
- * Progresso do download do modelo
- */
-export interface ProgressoDownload {
-  /** Porcentagem completa (0-100) */
-  porcentagem: number;
-
-  /** Bytes baixados */
-  baixados: number;
-
-  /** Total de bytes */
-  total: number;
-
-  /** Arquivo atual sendo baixado */
-  arquivoAtual?: string;
-}
-
-// ============================================================================
 // Hooks e Estado
 // ============================================================================
 
@@ -261,30 +223,4 @@ export interface AcoesClassificacao {
 
   /** Reseta o estado */
   resetar: () => void;
-}
-
-// ============================================================================
-// Consentimento e Privacidade
-// ============================================================================
-
-/**
- * Tipo de consentimento solicitado
- */
-export type TipoConsentimento = 'modelo_local' | 'backend_gdf';
-
-/**
- * Status do consentimento do usuário
- */
-export interface StatusConsentimento {
-  /** Se já foi perguntado sobre modelo local */
-  modeloLocalPerguntado: boolean;
-
-  /** Resposta do usuário sobre modelo local */
-  modeloLocalAceito: boolean | null;
-
-  /** Se já foi perguntado sobre backend GDF */
-  backendGDFPerguntado: boolean;
-
-  /** Resposta do usuário sobre backend GDF */
-  backendGDFAceito: boolean | null;
 }

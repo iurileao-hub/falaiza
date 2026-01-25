@@ -20,7 +20,7 @@ interface PrivacidadeIndicatorProps {
 }
 
 /**
- * Configuração de cada camada
+ * Configuração de cada camada (2 camadas após ADR-001)
  */
 const CAMADAS_CONFIG: Record<
   CamadaClassificacao,
@@ -41,21 +41,13 @@ const CAMADAS_CONFIG: Record<
     bgCor: 'bg-green-50 border-green-200',
     privacidade: 'Seus dados não saem do dispositivo',
   },
-  modelo_local: {
-    nome: 'IA Local',
-    icone: '🧠',
-    descricao: 'Modelo de IA executado no seu navegador',
-    cor: 'text-blue-700',
-    bgCor: 'bg-blue-50 border-blue-200',
-    privacidade: 'Processado localmente, sem envio de dados',
-  },
   backend_gdf: {
     nome: 'Servidor GDF',
     icone: '☁️',
-    descricao: 'Processamento em servidor seguro do GDF',
+    descricao: 'Processamento em servidor seguro do GDF com IA multimodal',
     cor: 'text-purple-700',
     bgCor: 'bg-purple-50 border-purple-200',
-    privacidade: 'Dados enviados apenas para servidores do GDF',
+    privacidade: 'Dados enviados apenas para servidores do GDF (HTTPS + LGPD)',
   },
 };
 
@@ -136,7 +128,7 @@ export function PrivacidadeBadge({
       title={config.privacidade}
     >
       <span aria-hidden="true">{config.icone}</span>
-      {camada === 'regras' ? 'Local' : camada === 'modelo_local' ? 'IA Local' : 'GDF'}
+      {camada === 'regras' ? 'Local' : 'GDF'}
     </span>
   );
 }
