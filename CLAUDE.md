@@ -138,7 +138,7 @@ hackathon-ouvidoria-df/
 │   │   └── api/
 │   │       ├── manifestacao/route.ts
 │   │       └── ia/
-│   │           └── classificar/route.ts  # Mock Backend GDF (Camada 3)
+│   │           └── classificar/route.ts  # Mock Backend GDF (Camada 2)
 │   │
 │   ├── components/
 │   │   ├── ui/            # shadcn/ui
@@ -386,10 +386,10 @@ npm run lighthouse
   - 800+ palavras-chave
   - Extração de entidades
 
-- [ ] **Testar em produção (Vercel)**
+- [x] **Testar em produção (Vercel)** ✅
   - Deploy e teste no celular
-  - Verificar PWA instalável
-  - Testar funcionamento offline
+  - Captura de mídia (áudio, vídeo, foto) funcionando
+  - Layout responsivo corrigido
 
 - [ ] **Gravar vídeo demonstrativo** (≤7 min)
   - Mostrar fluxo completo de manifestação
