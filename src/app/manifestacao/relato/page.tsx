@@ -30,6 +30,7 @@ export default function RelatoPage() {
     podeAvancar,
     etapaAtual,
     irParaEtapa,
+    resetar,
   } = useManifestacaoStore();
 
   const [showFileInput, setShowFileInput] = useState(false);
@@ -164,6 +165,16 @@ export default function RelatoPage() {
     router.push("/manifestacao");
   };
 
+  const handleRecomecar = () => {
+    const confirmado = window.confirm(
+      "Tem certeza que deseja recomeçar? Seu relato atual será apagado."
+    );
+    if (confirmado) {
+      resetar();
+      router.push("/manifestacao/relato");
+    }
+  };
+
   return (
     <WizardLayout etapaAtual={etapaAtual}>
       {/* Mensagem da IZA */}
@@ -284,6 +295,7 @@ export default function RelatoPage() {
         podeVoltar={true}
         onVoltar={handleVoltar}
         onAvancar={handleAvancar}
+        onRecomecar={handleRecomecar}
         className="mt-8"
       />
     </WizardLayout>

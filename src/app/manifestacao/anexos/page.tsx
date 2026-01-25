@@ -46,6 +46,7 @@ export default function AnexosPage() {
     podeAvancar,
     etapaAtual,
     irParaEtapa,
+    resetar,
   } = useManifestacaoStore();
 
   // Calcular tamanho total
@@ -105,6 +106,16 @@ export default function AnexosPage() {
   const handleVoltar = () => {
     irParaEtapa(2);
     router.push("/manifestacao/sugestao");
+  };
+
+  const handleRecomecar = () => {
+    const confirmado = window.confirm(
+      "Tem certeza que deseja recomeçar? Todos os dados serão apagados."
+    );
+    if (confirmado) {
+      resetar();
+      router.push("/manifestacao/relato");
+    }
   };
 
   return (
@@ -268,6 +279,7 @@ export default function AnexosPage() {
         podeVoltar={true}
         onVoltar={handleVoltar}
         onAvancar={handleAvancar}
+        onRecomecar={handleRecomecar}
         className="mt-8"
       />
     </WizardLayout>

@@ -22,6 +22,7 @@ export default function IdentificacaoPage() {
     podeAvancar,
     etapaAtual,
     irParaEtapa,
+    resetar,
   } = useManifestacaoStore();
 
   const anonimo = manifestacao.anonimo || false;
@@ -69,6 +70,16 @@ export default function IdentificacaoPage() {
   const handleVoltar = () => {
     irParaEtapa(3);
     router.push("/manifestacao/anexos");
+  };
+
+  const handleRecomecar = () => {
+    const confirmado = window.confirm(
+      "Tem certeza que deseja recomeçar? Todos os dados serão apagados."
+    );
+    if (confirmado) {
+      resetar();
+      router.push("/manifestacao/relato");
+    }
   };
 
   return (
@@ -131,6 +142,7 @@ export default function IdentificacaoPage() {
         podeVoltar={true}
         onVoltar={handleVoltar}
         onAvancar={handleAvancar}
+        onRecomecar={handleRecomecar}
         className="mt-8"
       />
     </WizardLayout>
