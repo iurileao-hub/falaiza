@@ -338,10 +338,8 @@ export const filaHelpers = {
 export async function inicializarDB(): Promise<boolean> {
   try {
     await db.open();
-    console.log("[DB] IndexedDB inicializado com sucesso");
     return true;
-  } catch (error) {
-    console.error("[DB] Erro ao inicializar IndexedDB:", error);
+  } catch {
     return false;
   }
 }
@@ -360,5 +358,4 @@ export async function limparDB(): Promise<void> {
       await db.filaSincronizacao.clear();
     }
   );
-  console.log("[DB] Banco limpo com sucesso");
 }

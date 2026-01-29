@@ -59,6 +59,22 @@ open http://localhost:3000
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/01-home.png" alt="Tela inicial da FalaIZA com serviços de Ouvidoria" width="250" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/02-relato.png" alt="Wizard de relato com IZA e barra de mídia" width="250" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/03-classificacao.png" alt="Classificação inteligente da IZA com indicador de confiança" width="250" />
+</p>
+
+<p align="center">
+  <em>Tela inicial · Relato com IZA e multicanalidade · Classificação inteligente automática</em>
+</p>
+
+---
+
 ## Índice
 
 1. [Problema e Solução](#1-problema-e-solução)

@@ -107,12 +107,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       },
     };
 
-    console.log('[API GDF Mock] Classificação concluída em', tempoProcessamento, 'ms');
-
     return NextResponse.json(response);
 
   } catch (error) {
-    console.error('[API GDF Mock] Erro:', error);
+    // Log apenas em desenvolvimento para não poluir logs de produção
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[API GDF Mock] Erro:', error);
+    }
 
     return NextResponse.json(
       { error: 'Erro interno ao processar classificação' },
