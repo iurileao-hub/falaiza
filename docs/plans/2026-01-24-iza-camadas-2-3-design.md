@@ -1,7 +1,9 @@
 # Design: IZA Inteligente - Camadas 2 e 3
 
 **Data:** 2026-01-24
-**Status:** Implementado
+**Status:** Parcialmente implementado
+
+> **Nota:** A Camada 2 (modelo local) descrita neste documento foi posteriormente removida por decisão arquitetural. Ver [ADR-001: Remoção do Modelo Local](../decisions/2026-01-25-remocao-modelo-local.md) para justificativa completa. A arquitetura final utiliza apenas Camada 1 (Regras) + Camada 3 (Backend GDF).
 
 > **Documento relacionado:** Para especificação técnica completa do Backend GDF (Camada 3), incluindo modelos recomendados, arquiteturas e configurações, consulte [backend-gdf-especificacao.md](./2026-01-24-backend-gdf-especificacao.md).
 
