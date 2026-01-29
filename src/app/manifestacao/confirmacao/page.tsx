@@ -96,9 +96,6 @@ export default function ConfirmacaoPage() {
         })),
       };
 
-      // DEBUG: Log payload para diagnóstico (remover após resolver)
-      console.log("[DEBUG] Payload enviado:", JSON.stringify(dadosEnvio, null, 2));
-
       // Chamar API
       const response = await fetch("/api/manifestacao", {
         method: "POST",
@@ -110,8 +107,6 @@ export default function ConfirmacaoPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        // DEBUG: Log detalhes da validação (remover após resolver)
-        console.error("[DEBUG] Resposta da API:", JSON.stringify(errorData, null, 2));
         const detalhes = errorData.detalhes
           ?.map((d: { campo: string; mensagem: string }) => `${d.campo}: ${d.mensagem}`)
           .join("; ");

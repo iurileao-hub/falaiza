@@ -6,11 +6,18 @@ import { validarCPF } from "./utils";
 
 /**
  * Schema de CPF com validação real
+ * Aceita tanto formatado (000.000.000-00) quanto apenas dígitos (00000000000)
  */
 export const cpfSchema = z
   .string()
   .min(1, "CPF é obrigatório")
-  .regex(VALIDACOES.cpf.pattern, "Formato inválido. Use: 000.000.000-00")
+  .refine(
+    (cpf) => {
+      const nums = cpf.replace(/\D/g, "");
+      return nums.length === 11;
+    },
+    "CPF deve ter 11 dígitos"
+  )
   .refine((cpf) => validarCPF(cpf), "CPF inválido");
 
 /**
@@ -23,13 +30,18 @@ export const emailSchema = z
 
 /**
  * Schema de Telefone (opcional)
+ * Aceita tanto formatado ((XX) XXXXX-XXXX) quanto apenas dígitos (XXXXXXXXXXX)
  */
 export const telefoneSchema = z
   .string()
   .optional()
   .refine(
-    (tel) => !tel || VALIDACOES.telefone.pattern.test(tel),
-    "Formato inválido. Use: (XX) XXXXX-XXXX"
+    (tel) => {
+      if (!tel) return true;
+      const nums = tel.replace(/\D/g, "");
+      return nums.length >= 10 && nums.length <= 11;
+    },
+    "Telefone deve ter 10 ou 11 dígitos"
   );
 
 /**
