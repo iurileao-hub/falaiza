@@ -1,4 +1,4 @@
-// Tipos para Acessibilidade - PWA Ouvidoria DF
+// Tipos para Acessibilidade - FalaIZA
 
 /** Tamanhos de fonte disponíveis */
 export type TamanhoFonte = "normal" | "large" | "larger";

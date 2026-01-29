@@ -1,4 +1,4 @@
-// Tipos para Manifestação - PWA Ouvidoria DF
+// Tipos para Manifestação - FalaIZA
 
 /** Tipos de manifestação disponíveis */
 export type TipoManifestacao =

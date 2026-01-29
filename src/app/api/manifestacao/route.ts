@@ -1,4 +1,4 @@
-// API Mock - Manifestação
+// API Manifestação - FalaIZA
 // Simula integração com backend do Participa DF
 // Configurado para fácil migração para API real
 

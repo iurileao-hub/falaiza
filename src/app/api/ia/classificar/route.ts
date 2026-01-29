@@ -1,5 +1,5 @@
 /**
- * API Mock - Backend GDF para Classificação de Manifestações
+ * API de Classificação Inteligente - FalaIZA
  *
  * Esta é uma implementação mock que simula o comportamento esperado
  * de uma API real do GDF para classificação inteligente.

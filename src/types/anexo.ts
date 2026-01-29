@@ -1,4 +1,4 @@
-// Tipos para Anexos e Mídia - PWA Ouvidoria DF
+// Tipos para Anexos e Mídia - FalaIZA
 
 import { TipoAnexo } from "./manifestacao";
 

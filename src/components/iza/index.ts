@@ -1,5 +1,5 @@
 /**
- * Componentes da IZA - Assistente Virtual da Ouvidoria
+ * Componentes da IZA - FalaIZA
  *
  * Exporta todos os componentes relacionados à IZA,
  * incluindo o sistema de classificação inteligente.

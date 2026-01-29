@@ -1,4 +1,4 @@
-// Banco de Mensagens da IZA - Assistente Virtual da Ouvidoria DF
+// Banco de Mensagens da IZA - FalaIZA
 // Configuração inteligente para fácil personalização e integração futura com IA
 
 import { TipoManifestacao } from "@/types/manifestacao";

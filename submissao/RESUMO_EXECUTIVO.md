@@ -1,4 +1,4 @@
-# IZA — Resumo Executivo
+# FalaIZA — Resumo Executivo
 
 **Autor:** Iúri Leão de Almeida
 **Telefone:** (61) 99645-1390
@@ -6,7 +6,7 @@
 
 **1º Hackathon em Controle Social: Desafio Participa DF**
 **Categoria:** II - Ouvidoria
-**Repositório:** https://github.com/iurileao-hub/hackathon-ouvidoria-df
+**Repositório:** https://github.com/iurileao-hub/falaiza
 
 ---
 
@@ -91,8 +91,8 @@ O cidadão pode combinar múltiplos formatos na mesma manifestação:
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/iurileao-hub/hackathon-ouvidoria-df.git
-cd hackathon-ouvidoria-df
+git clone https://github.com/iurileao-hub/falaiza.git
+cd falaiza
 
 # 2. Instale as dependências
 npm install
@@ -134,7 +134,7 @@ Conforme item 13.9 do Edital nº 10/2025:
 ## Estrutura do Projeto
 
 ```
-hackathon-ouvidoria-df/
+falaiza/
 ├── src/
 │   ├── app/                    # Next.js App Router
 │   │   ├── manifestacao/       # Wizard de 5 etapas

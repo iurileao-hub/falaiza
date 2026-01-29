@@ -1,6 +1,6 @@
 {
-  "name": "Ouvidoria DF - Participa DF",
-  "short_name": "Ouvidoria DF",
+  "name": "FalaIZA - Ouvidoria Participa DF",
+  "short_name": "FalaIZA",
   "description": "Registre sua manifestação para a Ouvidoria do Governo do Distrito Federal",
   "start_url": "/",
   "display": "standalone",

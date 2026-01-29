@@ -4,7 +4,7 @@ Este arquivo fornece orientações para o assistente de programação **Claude C
 
 ## Visão Geral do Projeto
 
-**Projeto:** PWA de Ouvidoria para o Participa DF
+**Projeto:** FalaIZA — PWA de Ouvidoria para o Participa DF
 **Hackathon:** 1º Hackathon em Controle Social: Desafio Participa DF
 **Categoria:** II - Ouvidoria
 **Objetivo:** Desenvolver uma PWA acessível para registro de manifestações cidadãs
@@ -118,7 +118,7 @@ font-family: 'Montserrat', 'Muli', sans-serif;
 ## Estrutura de Pastas (Atualizada)
 
 ```
-hackathon-ouvidoria-df/
+falaiza/
 ├── public/
 │   ├── manifest.json
 │   ├── sw.js

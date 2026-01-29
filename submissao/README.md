@@ -1,4 +1,4 @@
-# IZA — PWA de Ouvidoria Inteligente
+# FalaIZA — PWA de Ouvidoria Inteligente
 
 **Sistema de Registro de Manifestações com Classificação Automática por IA**
 
@@ -44,8 +44,8 @@ A **IZA** é uma PWA (Progressive Web App) de ouvidoria desenvolvida para o Gove
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/iurileao-hub/hackathon-ouvidoria-df.git
-cd hackathon-ouvidoria-df
+git clone https://github.com/iurileao-hub/falaiza.git
+cd falaiza
 
 # 2. Instale as dependências
 npm install
@@ -312,8 +312,8 @@ src/components/iza/
 
 ```bash
 # Clonar repositório
-git clone https://github.com/iurileao-hub/hackathon-ouvidoria-df.git
-cd hackathon-ouvidoria-df
+git clone https://github.com/iurileao-hub/falaiza.git
+cd falaiza
 
 # Instalar dependências
 npm install
@@ -347,7 +347,7 @@ npm start
 ## 6. Estrutura do Projeto
 
 ```
-hackathon-ouvidoria-df/
+falaiza/
 ├── public/
 │   ├── assets/
 │   │   ├── iza/                  # Avatares da IZA

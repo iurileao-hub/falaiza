@@ -12,7 +12,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Ouvidoria DF - Participa DF",
+  title: "FalaIZA - Ouvidoria Participa DF",
   description:
     "Registre sua manifestação para a Ouvidoria do Governo do Distrito Federal. Reclamações, denúncias, sugestões, elogios e solicitações.",
   keywords: [
@@ -31,14 +31,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     url: "https://ouvidoria.participa.df.gov.br",
-    title: "Ouvidoria DF - Participa DF",
+    title: "FalaIZA - Ouvidoria Participa DF",
     description:
       "Registre sua manifestação para a Ouvidoria do Governo do Distrito Federal",
-    siteName: "Participa DF",
+    siteName: "FalaIZA",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ouvidoria DF - Participa DF",
+    title: "FalaIZA - Ouvidoria Participa DF",
     description:
       "Registre sua manifestação para a Ouvidoria do Governo do Distrito Federal",
   },
@@ -65,10 +65,10 @@ export default function RootLayout({
     <html lang="pt-BR" className={montserrat.variable}>
       <head>
         {/* PWA Meta Tags */}
-        <meta name="application-name" content="Ouvidoria DF" />
+        <meta name="application-name" content="FalaIZA" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Ouvidoria DF" />
+        <meta name="apple-mobile-web-app-title" content="FalaIZA" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#192D4B" />
         <meta name="msapplication-tap-highlight" content="no" />
