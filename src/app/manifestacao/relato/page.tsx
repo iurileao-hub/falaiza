@@ -209,7 +209,10 @@ export default function RelatoPage() {
     );
     if (confirmado) {
       resetar();
-      router.push("/manifestacao/relato");
+      // Resetar estado local explicitamente (router.push para mesma URL é no-op)
+      setRelatoLocal("");
+      // Usar replace + query param para forçar re-render no Next.js
+      router.replace("/manifestacao/relato?nova=true");
     }
   };
 

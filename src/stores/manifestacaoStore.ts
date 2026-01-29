@@ -293,6 +293,19 @@ export const useManifestacaoStore = create<ManifestacaoState>()(
 
       // Reset - limpa estado e remove dados persistidos (inclui PII)
       resetar: () => {
+        // Revogar blob URLs dos anexos para liberar memória
+        // Importante no mobile onde blobs de áudio/vídeo podem travar o browser
+        const anexosAtuais = get().anexos;
+        for (const anexo of anexosAtuais) {
+          if (anexo.url) {
+            try {
+              URL.revokeObjectURL(anexo.url);
+            } catch {
+              // Ignorar se já foi revogado
+            }
+          }
+        }
+
         // Limpar localStorage para remover PII persistido
         if (typeof window !== "undefined") {
           localStorage.removeItem("manifestacao-ouvidoria");

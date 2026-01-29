@@ -78,7 +78,7 @@ export default function IdentificacaoPage() {
     );
     if (confirmado) {
       resetar();
-      router.push("/manifestacao/relato");
+      router.replace("/manifestacao/relato?nova=true");
     }
   };
 

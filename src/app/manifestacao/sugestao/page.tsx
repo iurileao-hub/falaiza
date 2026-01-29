@@ -51,7 +51,7 @@ export default function SugestaoPage() {
     );
     if (confirmado) {
       resetar();
-      router.push("/manifestacao/relato");
+      router.replace("/manifestacao/relato?nova=true");
     }
   };
 
