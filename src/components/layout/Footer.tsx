@@ -113,14 +113,18 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-4">
               <Link
-                href="/privacidade"
+                href="https://www.participa.df.gov.br/privacidade"
                 className="hover:opacity-100 no-underline text-white hover:text-white"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Política de Privacidade
               </Link>
               <Link
-                href="/termos"
+                href="https://www.participa.df.gov.br/termos"
                 className="hover:opacity-100 no-underline text-white hover:text-white"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Termos de Uso
               </Link>

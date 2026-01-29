@@ -65,6 +65,18 @@ export default function ConfirmacaoPage() {
 
   // Enviar manifestação
   const handleSubmit = async () => {
+    // Validação local antes de enviar
+    if (!manifestacao.tipo) {
+      setErrorMessage("Tipo de manifestação não selecionado. Volte à etapa de classificação.");
+      setSubmitStatus("error");
+      return;
+    }
+    if (!manifestacao.assunto?.categoria) {
+      setErrorMessage("Área/categoria não selecionada. Volte à etapa de classificação.");
+      setSubmitStatus("error");
+      return;
+    }
+
     setSubmitStatus("loading");
     setErrorMessage("");
 
@@ -95,7 +107,7 @@ export default function ConfirmacaoPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Erro ao enviar manifestação");
+        throw new Error(errorData.mensagem || "Erro ao enviar manifestação");
       }
 
       const data = await response.json();
