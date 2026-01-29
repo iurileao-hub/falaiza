@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Menu, X, LogIn } from "lucide-react";
+// Nota: LogIn mantido para o botão visual desabilitado
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -53,18 +54,18 @@ export function Header() {
             </Link>
           </div>
 
-          {/* Direita: Botão Entrar */}
+          {/* Direita: Botão Entrar (desabilitado - funcionalidade futura) */}
           <div className="flex items-center">
             <Button
               variant="ghost"
               size="sm"
-              className="text-white hover:bg-white/10 flex items-center gap-2 font-medium"
-              asChild
+              className="text-white/50 cursor-not-allowed flex items-center gap-2 font-medium"
+              disabled
+              title="Em breve"
+              aria-label="Entrar (em breve)"
             >
-              <Link href="/login">
-                <LogIn className="h-4 w-4" />
-                <span className="hidden sm:inline uppercase tracking-wide">Entrar</span>
-              </Link>
+              <LogIn className="h-4 w-4" />
+              <span className="hidden sm:inline uppercase tracking-wide">Entrar</span>
             </Button>
           </div>
         </div>

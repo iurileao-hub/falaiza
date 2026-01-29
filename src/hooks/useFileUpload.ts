@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { MEDIA_CONFIG, FORMATOS_ACEITOS } from "@/lib/constants";
+import { gerarId, formatarTamanhoArquivo } from "@/lib/utils";
 
 export interface FileUploadOptions {
   /** Tipos MIME aceitos */
@@ -45,9 +46,6 @@ export interface FileUploadResult {
   openFileSelector: () => void;
 }
 
-const generateId = () =>
-  `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
 const getFileType = (
   file: File
 ): "image" | "video" | "audio" | "document" => {
@@ -55,12 +53,6 @@ const getFileType = (
   if (file.type.startsWith("video/")) return "video";
   if (file.type.startsWith("audio/")) return "audio";
   return "document";
-};
-
-const formatFileSize = (bytes: number): string => {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
 const validateFile = (
@@ -87,7 +79,7 @@ const validateFile = (
 
   // Verificar tamanho
   if (maxSize && file.size > maxSize) {
-    return `Arquivo muito grande: ${formatFileSize(file.size)}. Máximo: ${formatFileSize(maxSize)}`;
+    return `Arquivo muito grande: ${formatarTamanhoArquivo(file.size)}. Máximo: ${formatarTamanhoArquivo(maxSize)}`;
   }
 
   return null;
@@ -151,14 +143,14 @@ export function useFileUpload(
           MEDIA_CONFIG.totalMaxSize
         ) {
           errors.push(
-            `Limite total de ${formatFileSize(MEDIA_CONFIG.totalMaxSize)} excedido.`
+            `Limite total de ${formatarTamanhoArquivo(MEDIA_CONFIG.totalMaxSize)} excedido.`
           );
           return;
         }
 
         try {
           newFiles.push({
-            id: generateId(),
+            id: gerarId(),
             file,
             url: URL.createObjectURL(file),
             type: getFileType(file),

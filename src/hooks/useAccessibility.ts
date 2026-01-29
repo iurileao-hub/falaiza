@@ -176,7 +176,7 @@ export function useAccessibility(): UseAccessibilityReturn {
         // Limpar após um tempo para permitir novos anúncios
         setTimeout(() => {
           announcer.textContent = "";
-        }, 1000);
+        }, 5000);
       }
     },
     []

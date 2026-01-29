@@ -12,12 +12,12 @@ export function gerarProtocolo(): string {
   const mes = String(agora.getMonth() + 1).padStart(2, "0");
   const dia = String(agora.getDate()).padStart(2, "0");
 
-  // Gera sequencial de 8 dígitos baseado em timestamp + random
-  const timestamp = agora.getTime().toString().slice(-6);
-  const random = Math.floor(Math.random() * 100)
-    .toString()
-    .padStart(2, "0");
-  const sequencial = (timestamp + random).padStart(8, "0");
+  // Gera sequencial de 8 dígitos usando crypto para maior segurança
+  const bytes = new Uint8Array(4);
+  crypto.getRandomValues(bytes);
+  // Converte 4 bytes em número de até 8 dígitos (max 99999999)
+  const randomNum = ((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]) >>> 0;
+  const sequencial = (randomNum % 100000000).toString().padStart(8, "0");
 
   return `${ano}.${mes}${dia}.${sequencial}`;
 }

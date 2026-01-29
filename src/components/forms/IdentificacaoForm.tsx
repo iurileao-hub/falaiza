@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -56,18 +56,32 @@ export function IdentificacaoForm({
   const [telefone, setTelefone] = useState(initialData?.telefone || "");
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
 
-  // Atualizar parent quando dados mudam
-  useEffect(() => {
-    if (!anonimo) {
-      onChange({
-        nome,
-        cpf: cpf.replace(/\D/g, ""),
-        email,
-        telefone: telefone.replace(/\D/g, ""),
-        notificacoes: true, // Default: receber notificações
-      });
-    }
-  }, [nome, cpf, email, telefone, anonimo, onChange]);
+  // Refs para manter valores atuais sem causar re-render
+  const nomeRef = useRef(nome);
+  const cpfRef = useRef(cpf);
+  const emailRef = useRef(email);
+  const telefoneRef = useRef(telefone);
+
+  // Notificar o parent sobre mudanças nos dados do formulário
+  const notificarMudanca = useCallback(
+    (campos: { nome?: string; cpf?: string; email?: string; telefone?: string }) => {
+      const nomeAtual = campos.nome ?? nomeRef.current;
+      const cpfAtual = campos.cpf ?? cpfRef.current;
+      const emailAtual = campos.email ?? emailRef.current;
+      const telefoneAtual = campos.telefone ?? telefoneRef.current;
+
+      if (!anonimo) {
+        onChange({
+          nome: nomeAtual,
+          cpf: cpfAtual.replace(/\D/g, ""),
+          email: emailAtual,
+          telefone: telefoneAtual.replace(/\D/g, ""),
+          notificacoes: true, // Default: receber notificações
+        });
+      }
+    },
+    [anonimo, onChange]
+  );
 
   // Validação local
   const validateField = (field: string, value: string) => {
@@ -184,8 +198,11 @@ export function IdentificacaoForm({
             type="text"
             value={nome}
             onChange={(e) => {
-              setNome(e.target.value);
-              validateField("nome", e.target.value);
+              const valor = e.target.value;
+              setNome(valor);
+              nomeRef.current = valor;
+              validateField("nome", valor);
+              notificarMudanca({ nome: valor });
             }}
             onBlur={() => validateField("nome", nome)}
             placeholder="Digite seu nome completo"
@@ -214,7 +231,9 @@ export function IdentificacaoForm({
             onChange={(e) => {
               const formatted = formatCPF(e.target.value);
               setCpf(formatted);
+              cpfRef.current = formatted;
               validateField("cpf", formatted);
+              notificarMudanca({ cpf: formatted });
             }}
             onBlur={() => validateField("cpf", cpf)}
             placeholder="000.000.000-00"
@@ -241,8 +260,11 @@ export function IdentificacaoForm({
             type="email"
             value={email}
             onChange={(e) => {
-              setEmail(e.target.value);
-              validateField("email", e.target.value);
+              const valor = e.target.value;
+              setEmail(valor);
+              emailRef.current = valor;
+              validateField("email", valor);
+              notificarMudanca({ email: valor });
             }}
             onBlur={() => validateField("email", email)}
             placeholder="seu.email@exemplo.com"
@@ -274,7 +296,9 @@ export function IdentificacaoForm({
             onChange={(e) => {
               const formatted = formatPhone(e.target.value);
               setTelefone(formatted);
+              telefoneRef.current = formatted;
               validateField("telefone", formatted);
+              notificarMudanca({ telefone: formatted });
             }}
             onBlur={() => validateField("telefone", telefone)}
             placeholder="(00) 00000-0000"

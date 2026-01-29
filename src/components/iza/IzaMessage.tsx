@@ -24,15 +24,17 @@ export function IzaMessage({
       role="status"
       aria-live="polite"
     >
-      {/* Triângulo do balão */}
-      <div
-        className="absolute -left-3 bottom-4 w-0 h-0 border-t-[12px] border-t-transparent border-r-[16px] border-r-surface border-b-[12px] border-b-transparent"
-        aria-hidden="true"
-      />
+      {/* Triângulo do balão — borda */}
       <div
         className="absolute -left-[14px] bottom-4 w-0 h-0 border-t-[12px] border-t-transparent border-r-[16px] border-r-border border-b-[12px] border-b-transparent"
         aria-hidden="true"
-        style={{ zIndex: -1 }}
+        style={{ zIndex: 0 }}
+      />
+      {/* Triângulo do balão — preenchimento */}
+      <div
+        className="absolute -left-[12px] bottom-4 w-0 h-0 border-t-[12px] border-t-transparent border-r-[16px] border-r-surface border-b-[12px] border-b-transparent"
+        aria-hidden="true"
+        style={{ zIndex: 1 }}
       />
 
       {/* Conteúdo */}

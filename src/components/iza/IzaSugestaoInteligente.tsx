@@ -6,9 +6,10 @@
 
 'use client';
 
-import { useEffect, useMemo, useCallback } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { IzaMessage } from './IzaMessage';
+import { IzaAvatar } from './IzaAvatar';
 import { SeletorComConfianca } from './SeletorComConfianca';
 import { getNivelConfianca } from './ConfiancaIndicator';
 import { useClassificacao } from '@/hooks/useClassificacao';
@@ -34,7 +35,7 @@ interface IzaSugestaoInteligenteProps {
 function montarMensagemIza(
   resultado: ClassificacaoResultado | null,
   status: 'idle' | 'classificando' | 'sucesso' | 'erro'
-): string {
+): React.ReactNode {
   if (status === 'classificando') {
     return 'Deixa eu analisar o que você me contou...';
   }
@@ -56,14 +57,14 @@ function montarMensagemIza(
   const orgaoNome = orgaoMeta?.nome || 'órgão';
 
   if (nivel === 'alta') {
-    return `Entendi! Pelo que você me contou, isso parece ser ${artigo} ${tipoNome} sobre ${orgaoNome}. Está certo?`;
+    return <>Entendi! Pelo que você me contou, isso parece ser {artigo} {tipoNome} sobre {orgaoNome}. <strong>Está certo?</strong></>;
   }
 
   if (nivel === 'media') {
-    return `Analisando seu relato, acredito que seja ${artigo} ${tipoNome} relacionad${artigo === 'uma' ? 'a' : 'o'} a ${orgaoNome}. Confira se está correto!`;
+    return <>Analisando seu relato, acredito que seja {artigo} {tipoNome} relacionad{artigo === 'uma' ? 'a' : 'o'} a {orgaoNome}. <strong>Confira se está correto!</strong></>;
   }
 
-  return `Não tenho certeza, mas pode ser ${artigo} ${tipoNome} sobre ${orgaoNome}. Por favor, verifique e ajuste se necessário.`;
+  return <>Não tenho certeza, mas pode ser {artigo} {tipoNome} sobre {orgaoNome}. <strong>Por favor, verifique e ajuste se necessário.</strong></>;
 }
 
 export function IzaSugestaoInteligente({ className }: IzaSugestaoInteligenteProps) {
@@ -166,10 +167,15 @@ export function IzaSugestaoInteligente({ className }: IzaSugestaoInteligenteProp
 
   return (
     <div className={cn('space-y-6', className)}>
-      {/* Mensagem da IZA */}
-      <IzaMessage animate={status !== 'classificando'}>
-        {mensagemIza}
-      </IzaMessage>
+      {/* Mensagem da IZA com avatar */}
+      <div className="flex items-end gap-3">
+        <IzaAvatar variante="default" size="md" />
+        <div className="flex-1 min-w-0">
+          <IzaMessage animate={status !== 'classificando'}>
+            {mensagemIza}
+          </IzaMessage>
+        </div>
+      </div>
 
       {/* Loading state */}
       {status === 'classificando' && (
@@ -180,7 +186,7 @@ export function IzaSugestaoInteligente({ className }: IzaSugestaoInteligenteProp
         >
           <Loader2 className="w-6 h-6 animate-spin text-primary" />
           <span className="text-gray-600">
-            Analisando... {Math.round(progresso * 100)}%
+            Analisando...
           </span>
         </div>
       )}

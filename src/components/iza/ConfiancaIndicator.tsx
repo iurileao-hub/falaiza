@@ -86,7 +86,7 @@ export function ConfiancaIndicator({
       aria-valuenow={porcentagem}
       aria-valuemin={0}
       aria-valuemax={100}
-      aria-label={`Confiança da classificação: ${porcentagem}%`}
+      aria-label={`Confiança da classificação: ${TEXTOS_NIVEL[nivel].toLowerCase()}`}
     >
       {/* Barra de progresso */}
       <div
@@ -127,7 +127,6 @@ export function ConfiancaBadge({
 }) {
   const nivel = getNivelConfianca(confianca);
   const cores = CORES_NIVEL[nivel];
-  const porcentagem = Math.round(confianca * 100);
 
   return (
     <span
@@ -138,10 +137,10 @@ export function ConfiancaBadge({
         className
       )}
       role="status"
-      aria-label={`${porcentagem}% de confiança`}
+      aria-label={TEXTOS_NIVEL[nivel]}
     >
       <span className={cn('w-1.5 h-1.5 rounded-full', cores.bar)} />
-      {porcentagem}%
+      {TEXTOS_NIVEL[nivel]}
     </span>
   );
 }

@@ -42,6 +42,7 @@ interface ClassificacaoResponse {
   };
 }
 
+// TODO: Adicionar rate limiting para produção (ex: 60 req/min por IP)
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const inicio = performance.now();
 
@@ -62,13 +63,24 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
+    // Validação de tamanho máximo para evitar abuso
+    const MAX_RELATO_LENGTH = 10000;
+    const relatoLimpo = body.relato.trim();
+
+    if (relatoLimpo.length > MAX_RELATO_LENGTH) {
+      return NextResponse.json(
+        { error: `Relato excede o tamanho máximo de ${MAX_RELATO_LENGTH} caracteres` },
+        { status: 400 }
+      );
+    }
+
     // Simular latência de rede/processamento (100-500ms)
     const latenciaSimulada = 100 + Math.random() * 400;
     await new Promise(resolve => setTimeout(resolve, latenciaSimulada));
 
     // Usar a Camada 1 como base e adicionar "boost" de confiança
     // Em produção, seria um modelo de ML real no servidor
-    const resultadoBase = classificarPorRegras(body.relato);
+    const resultadoBase = classificarPorRegras(relatoLimpo);
 
     // Simular melhoria de confiança do modelo de IA do GDF
     // (em produção, seria resultado real do modelo)
@@ -110,47 +122,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 }
 
 /**
- * GET - Informações sobre a API
+ * GET - Informações básicas sobre a API
+ * Retorna apenas nome e status, sem expor detalhes internos
  */
 export async function GET(): Promise<NextResponse> {
   return NextResponse.json({
-    nome: 'API de Classificação Inteligente - Mock GDF',
+    nome: 'API de Classificação Inteligente - Ouvidoria DF',
     versao: 'mock-v1.0.0',
-    descricao: 'Simula o comportamento da API real do GDF para classificação de manifestações',
-    endpoints: {
-      POST: {
-        descricao: 'Classifica uma manifestação',
-        body: {
-          relato: 'string (obrigatório, mínimo 10 caracteres)',
-        },
-        response: {
-          tipo: '{ id: string, confianca: number }',
-          orgao: '{ id: string, confianca: number }',
-          entidades: '{ locais: string[], datas: string[], orgaosMencionados: string[] }',
-          resumo: 'string',
-          meta: '{ fonte: "backend_gdf", tempoProcessamento: number, sigiloso: true }',
-        },
-      },
-    },
-    multimodal: {
-      status: 'planejado',
-      descricao: 'Em produção, a API suportará análise multimodal',
-      capacidades: [
-        'Transcrição automática de áudio (Whisper)',
-        'Transcrição de vídeo',
-        'OCR e análise de imagens/documentos',
-        'Classificação unificada de todas as modalidades',
-      ],
-      beneficios: [
-        'Acessibilidade para usuários que preferem áudio/vídeo',
-        'Extração de informações de documentos fotografados',
-        'Análise de contexto visual em reclamações',
-      ],
-    },
-    privacidade: {
-      sigiloso: true,
-      armazenamento: 'Nenhum dado é armazenado permanentemente',
-      conformidade: ['LAI', 'LGPD'],
-    },
+    status: 'operacional',
+    descricao: 'Endpoint para classificação de manifestações cidadãs',
   });
 }

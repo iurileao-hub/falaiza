@@ -114,27 +114,20 @@ export default function ConfirmacaoPage() {
     }
   };
 
-  // Copiar protocolo
+  // Copiar protocolo usando API moderna
   const handleCopyProtocolo = async () => {
     try {
       await navigator.clipboard.writeText(protocolo);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback para navegadores sem suporte
-      const textArea = document.createElement("textarea");
-      textArea.value = protocolo;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textArea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      // Se a API não estiver disponível, orientar cópia manual
+      alert(`Copie manualmente: ${protocolo}`);
     }
   };
 
   // Nova manifestação
-  const handleNovaManifestaçao = () => {
+  const handleNovaManifestacao = () => {
     resetar();
     router.push("/manifestacao/relato?nova=true");
   };
@@ -207,7 +200,7 @@ export default function ConfirmacaoPage() {
 
           {/* Ações */}
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <Button variant="outline" onClick={handleNovaManifestaçao}>
+            <Button variant="outline" onClick={handleNovaManifestacao}>
               Nova manifestação
             </Button>
             <Button onClick={() => router.push("/")}>

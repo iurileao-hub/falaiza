@@ -173,25 +173,17 @@ export function validarParcial<T extends z.ZodObject<z.ZodRawShape>>(
 
 /**
  * Valida se pode avançar para próxima etapa
+ *
+ * Fluxo Story-First (5 etapas):
+ * 1 = Relato, 2 = Sugestão/Classificação, 3 = Anexos,
+ * 4 = Identificação, 5 = Confirmação
  */
 export function validarEtapa(
   etapa: number,
   dados: Partial<EnvioManifestacaoInput>
 ): { valido: boolean; mensagem?: string } {
   switch (etapa) {
-    case 1: // Tipo
-      if (!dados.tipo) {
-        return { valido: false, mensagem: "Selecione o tipo de manifestação" };
-      }
-      return { valido: true };
-
-    case 2: // Assunto
-      if (!dados.assunto?.categoria) {
-        return { valido: false, mensagem: "Selecione uma categoria" };
-      }
-      return { valido: true };
-
-    case 3: // Relato
+    case 1: { // Relato (texto ou mídia)
       const temRelato = dados.relato && dados.relato.length >= VALIDACOES.relato.minCaracteres;
       const temAnexo = dados.anexos && dados.anexos.length > 0;
       if (!temRelato && !temAnexo) {
@@ -201,11 +193,18 @@ export function validarEtapa(
         };
       }
       return { valido: true };
+    }
 
-    case 4: // Anexos
-      return { valido: true }; // Opcional
+    case 2: // Sugestão/Classificação (tipo e área)
+      if (!dados.tipo) {
+        return { valido: false, mensagem: "Selecione o tipo de manifestação" };
+      }
+      return { valido: true };
 
-    case 5: // Identificação
+    case 3: // Anexos (opcional)
+      return { valido: true };
+
+    case 4: // Identificação
       if (!dados.anonimo && !dados.identificacao) {
         return { valido: false, mensagem: "Preencha seus dados de identificação" };
       }
@@ -217,7 +216,7 @@ export function validarEtapa(
       }
       return { valido: true };
 
-    case 6: // Confirmação
+    case 5: // Confirmação
       return { valido: true };
 
     default:

@@ -291,19 +291,28 @@ export const useManifestacaoStore = create<ManifestacaoState>()(
         return config?.permiteAnonimo ?? false;
       },
 
-      // Reset
-      resetar: () =>
+      // Reset - limpa estado e remove dados persistidos (inclui PII)
+      resetar: () => {
+        // Limpar localStorage para remover PII persistido
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("manifestacao-ouvidoria");
+        }
         set({
           manifestacao: { ...estadoInicial, criadoEm: new Date() },
           anexos: [],
           classificacao: null,
           etapaAtual: 1,
-        }),
+        });
+      },
     }),
     {
       name: "manifestacao-ouvidoria",
       partialize: (state) => ({
-        manifestacao: state.manifestacao,
+        manifestacao: {
+          ...state.manifestacao,
+          // Não persistir dados pessoais (PII) - LGPD
+          identificacao: null,
+        },
         // Não persistir anexos - blob URLs não sobrevivem ao reload
         // O usuário precisará adicionar novamente após recarregar a página
         anexos: [],

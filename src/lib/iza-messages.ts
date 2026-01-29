@@ -2,6 +2,7 @@
 // Configuração inteligente para fácil personalização e integração futura com IA
 
 import { TipoManifestacao } from "@/types/manifestacao";
+import { artigoTipo } from "@/lib/iza";
 
 /**
  * Variações visuais da IZA
@@ -19,21 +20,6 @@ export const IZA_AVATARES: Record<IzaVariante, string> = {
   erro: "/assets/iza/iza-1.png",
   pensando: "/assets/iza/iza-3.png",
   acenando: "/assets/iza/iza-1.png",
-};
-
-/**
- * Função auxiliar para artigo correto do tipo
- */
-const artigoTipo = (tipo: TipoManifestacao): string => {
-  const artigos: Record<TipoManifestacao, string> = {
-    reclamacao: "uma",
-    denuncia: "uma",
-    sugestao: "uma",
-    elogio: "um",
-    solicitacao: "uma",
-    informacao: "um pedido de",
-  };
-  return artigos[tipo] || "uma";
 };
 
 /**

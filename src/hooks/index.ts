@@ -24,3 +24,5 @@ export type {
   AccessibilitySettings,
   UseAccessibilityReturn,
 } from "./useAccessibility";
+
+export { useClassificacao } from "./useClassificacao";

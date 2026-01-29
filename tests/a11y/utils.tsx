@@ -85,7 +85,7 @@ export const checkA11y = async (container: Element) => {
  */
 export const formatViolations = (violations: Array<{
   id: string;
-  impact?: string;
+  impact?: string | null;
   description: string;
   help: string;
   helpUrl: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import { WizardLayout } from "@/components/wizard/WizardLayout";
@@ -13,11 +13,8 @@ import { MediaPreview } from "@/components/media/MediaPreview";
 import { useManifestacaoStore } from "@/stores/manifestacaoStore";
 import { MENSAGENS_IZA } from "@/lib/iza-messages";
 import { VALIDACOES, MEDIA_CONFIG } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn, gerarId } from "@/lib/utils";
 import { PreviewAnexo, TipoAnexo } from "@/types/anexo";
-
-const generateId = () =>
-  `anexo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 export default function RelatoPage() {
   const router = useRouter();
@@ -33,9 +30,41 @@ export default function RelatoPage() {
     resetar,
   } = useManifestacaoStore();
 
-  const [showFileInput, setShowFileInput] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const relato = manifestacao.relato || "";
+  // Estado local para digitação instantânea, com debounce para persistência no store
+  const [relatoLocal, setRelatoLocal] = useState(manifestacao.relato || "");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sincronizar estado local quando o store muda externamente (ex: reset)
+  useEffect(() => {
+    setRelatoLocal(manifestacao.relato || "");
+  }, [manifestacao.relato]);
+
+  // Debounce: persiste no store após 300ms sem digitação
+  const handleRelatoChange = useCallback(
+    (valor: string) => {
+      setRelatoLocal(valor);
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+      debounceRef.current = setTimeout(() => {
+        setRelato(valor);
+      }, 300);
+    },
+    [setRelato]
+  );
+
+  // Limpar timeout ao desmontar
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
+
+  const relato = relatoLocal;
   const caracteresRestantes = VALIDACOES.relato.minimo - relato.length;
   const temTextoSuficiente = relato.length >= VALIDACOES.relato.minimo;
   const temMidia = anexos.length > 0;
@@ -61,7 +90,7 @@ export default function RelatoPage() {
   const handleAudioRecorded = useCallback(
     (blob: Blob, duration: number) => {
       const anexo: PreviewAnexo = {
-        id: generateId(),
+        id: gerarId(),
         nome: `audio-${Date.now()}.webm`,
         tipo: "audio" as TipoAnexo,
         tamanho: blob.size,
@@ -77,7 +106,7 @@ export default function RelatoPage() {
   const handleVideoRecorded = useCallback(
     (blob: Blob, duration: number) => {
       const anexo: PreviewAnexo = {
-        id: generateId(),
+        id: gerarId(),
         nome: `video-${Date.now()}.webm`,
         tipo: "video" as TipoAnexo,
         tamanho: blob.size,
@@ -93,7 +122,7 @@ export default function RelatoPage() {
   const handlePhotoCaptured = useCallback(
     (blob: Blob) => {
       const anexo: PreviewAnexo = {
-        id: generateId(),
+        id: gerarId(),
         nome: `foto-${Date.now()}.jpg`,
         tipo: "foto" as TipoAnexo,
         tamanho: blob.size,
@@ -106,7 +135,7 @@ export default function RelatoPage() {
   );
 
   const handleFileSelected = useCallback(() => {
-    setShowFileInput(true);
+    fileInputRef.current?.click();
   }, []);
 
   // Handler para input de arquivo
@@ -123,7 +152,7 @@ export default function RelatoPage() {
         else if (file.type.startsWith("audio/")) tipo = "audio";
 
         const anexo: PreviewAnexo = {
-          id: generateId(),
+          id: gerarId(),
           nome: file.name,
           tipo,
           tamanho: file.size,
@@ -133,9 +162,8 @@ export default function RelatoPage() {
         adicionarAnexo(anexo);
       });
 
-      // Reset input
+      // Reset input para permitir selecionar o mesmo arquivo novamente
       e.target.value = "";
-      setShowFileInput(false);
     },
     [adicionarAnexo]
   );
@@ -151,8 +179,18 @@ export default function RelatoPage() {
     [anexos, removerAnexo]
   );
 
+  // Persiste imediatamente o relato local no store (flush do debounce)
+  const flushRelato = useCallback(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+      debounceRef.current = null;
+    }
+    setRelato(relatoLocal);
+  }, [relatoLocal, setRelato]);
+
   // Novo fluxo: Relato é etapa 1, próxima é Sugestão (etapa 2)
   const handleAvancar = () => {
+    flushRelato();
     if (podeAvancar()) {
       irParaEtapa(2);
       router.push("/manifestacao/sugestao");
@@ -191,7 +229,7 @@ export default function RelatoPage() {
             id="relato"
             placeholder="Descreva sua manifestação aqui. Seja o mais detalhado possível para que possamos ajudá-lo melhor..."
             value={relato}
-            onChange={(e) => setRelato(e.target.value)}
+            onChange={(e) => handleRelatoChange(e.target.value)}
             className={cn(
               "min-h-[200px] resize-y",
               !podeEnviar && relato.length > 0 && "border-warning"
@@ -233,18 +271,17 @@ export default function RelatoPage() {
           disabled={tamanhoTotal >= tamanhoMaximo}
         />
 
-        {/* Input de arquivo hidden - acessível para tecnologias assistivas */}
-        {showFileInput && (
-          <input
-            type="file"
-            multiple
-            accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
-            onChange={handleFileInputChange}
-            className="hidden"
-            ref={(input) => input?.click()}
-            aria-label="Selecionar arquivos para anexar"
-          />
-        )}
+        {/* Input de arquivo visualmente oculto mas sempre presente no DOM */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
+          onChange={handleFileInputChange}
+          className="sr-only"
+          aria-label="Selecionar arquivos para anexar"
+          tabIndex={-1}
+        />
 
         {/* Preview de anexos */}
         {anexos.length > 0 && (

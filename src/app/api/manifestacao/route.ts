@@ -44,6 +44,7 @@ function log(message: string, data?: unknown) {
  * POST /api/manifestacao
  * Recebe e processa uma nova manifestação
  */
+// TODO: Adicionar rate limiting para produção (ex: 30 req/min por IP)
 export async function POST(request: NextRequest) {
   try {
     log("Recebendo nova manifestação...");
@@ -68,39 +69,25 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     log("Dados recebidos:", body);
 
-    // Em modo demo, validação simplificada
-    let dados = body;
+    // Validação Zod sempre ativa, independente do modo (demo ou produção)
+    const validacao = envioManifestacaoSchema.safeParse(body);
 
-    if (!MOCK_CONFIG.demoMode) {
-      // Validar dados (modo produção)
-      const validacao = envioManifestacaoSchema.safeParse(body);
-
-      if (!validacao.success) {
-        log("Erro de validação:", validacao.error.issues);
-        return NextResponse.json(
-          {
-            success: false,
-            erro: "VALIDATION_ERROR",
-            mensagem: "Dados inválidos. Verifique os campos e tente novamente.",
-            detalhes: validacao.error.issues.map((issue: z.ZodIssue) => ({
-              campo: issue.path.join("."),
-              mensagem: issue.message,
-            })),
-          },
-          { status: 400 }
-        );
-      }
-      dados = validacao.data;
-    } else {
-      // Modo demo: validação básica apenas
-      log("Modo demo: validação simplificada");
-      if (!body.tipo) {
-        return NextResponse.json(
-          { success: false, erro: "VALIDATION_ERROR", mensagem: "Tipo é obrigatório" },
-          { status: 400 }
-        );
-      }
+    if (!validacao.success) {
+      log("Erro de validação:", validacao.error.issues);
+      return NextResponse.json(
+        {
+          success: false,
+          erro: "VALIDATION_ERROR",
+          mensagem: "Dados inválidos. Verifique os campos e tente novamente.",
+          detalhes: validacao.error.issues.map((issue: z.ZodIssue) => ({
+            campo: issue.path.join("."),
+            mensagem: issue.message,
+          })),
+        },
+        { status: 400 }
+      );
     }
+    const dados = validacao.data;
 
     // Gerar protocolo
     const protocolo = gerarProtocolo();
@@ -160,37 +147,13 @@ export async function POST(request: NextRequest) {
 
 /**
  * GET /api/manifestacao
- * Retorna informações sobre o endpoint (para documentação)
+ * Retorna informações básicas sobre o endpoint, sem expor detalhes internos
  */
 export async function GET() {
   return NextResponse.json({
-    name: "API Manifestação - Ouvidoria DF",
-    version: "1.0.0",
-    description: "API mock para registro de manifestações cidadãs",
-    endpoints: {
-      "POST /api/manifestacao": {
-        description: "Registra uma nova manifestação",
-        body: {
-          tipo: "string (reclamacao|denuncia|sugestao|elogio|solicitacao|informacao)",
-          assunto: {
-            categoria: "string",
-            subcategoria: "string (opcional)",
-            descricao: "string (opcional)",
-          },
-          relato: "string (mín. 20 caracteres)",
-          anonimo: "boolean",
-          identificacao: "object | null",
-          anexos: "array (opcional)",
-        },
-        response: {
-          success: "boolean",
-          protocolo: "string (formato: AAAA.MMDD.XXXXXXXX)",
-          mensagem: "string",
-          prazoResposta: "string",
-        },
-      },
-    },
-    status: "mock",
-    note: "Este é um endpoint mock para desenvolvimento. Em produção, conectar ao backend real do Participa DF.",
+    nome: "API Manifestação - Ouvidoria DF",
+    versao: "1.0.0",
+    status: "operacional",
+    descricao: "Endpoint para registro de manifestações cidadãs",
   });
 }

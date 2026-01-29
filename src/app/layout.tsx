@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Montserrat } from "next/font/google";
 import { AccessibilityPanel, AxeProvider } from "@/components/accessibility";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -100,8 +101,10 @@ export default function RootLayout({
           Ir para navegação
         </a>
 
-        {/* Conteúdo Principal com verificação de acessibilidade */}
-        <AxeProvider>{children}</AxeProvider>
+        {/* Conteúdo Principal com barreira de erro e verificação de acessibilidade */}
+        <ErrorBoundary>
+          <AxeProvider>{children}</AxeProvider>
+        </ErrorBoundary>
 
         {/* Live Region para anúncios de acessibilidade */}
         <div

@@ -86,6 +86,36 @@ export function AccessibilityPanel({ className }: AccessibilityPanelProps) {
     };
   }, [isOpen]);
 
+  // Armadilha de foco (focus trap) — impede que o teclado saia do painel modal
+  const handlePanelKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key !== "Tab" || !panelRef.current) return;
+
+      const focusableElements = panelRef.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusableElements.length === 0) return;
+
+      const firstEl = focusableElements[0];
+      const lastEl = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey) {
+        // Shift+Tab: se estiver no primeiro elemento, vai para o último
+        if (document.activeElement === firstEl) {
+          e.preventDefault();
+          lastEl.focus();
+        }
+      } else {
+        // Tab: se estiver no último elemento, volta para o primeiro
+        if (document.activeElement === lastEl) {
+          e.preventDefault();
+          firstEl.focus();
+        }
+      }
+    },
+    []
+  );
+
   const handleToggle = useCallback(() => {
     setIsOpen((prev) => !prev);
     announce(!isOpen ? "Painel de acessibilidade aberto" : "Painel de acessibilidade fechado");
@@ -161,6 +191,7 @@ export function AccessibilityPanel({ className }: AccessibilityPanelProps) {
           role="dialog"
           aria-modal="true"
           aria-label="Configurações de Acessibilidade"
+          onKeyDown={handlePanelKeyDown}
           className={cn(
             "fixed bottom-20 right-4 w-80 max-h-[80vh] overflow-y-auto",
             "bg-white rounded-lg shadow-2xl border border-border",

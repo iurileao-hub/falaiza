@@ -25,6 +25,10 @@ Este arquivo fornece orientações para o assistente de programação **Claude C
 - [x] Header/Navbar estilo Participa DF
 - [x] Acessibilidade (WCAG 2.1 AA)
 - [x] Testes automatizados de acessibilidade
+- [x] Code review de segurança e qualidade ✅
+- [x] Hardening de APIs (validação, max-length, Zod sempre ativo)
+- [x] Error Boundary e página 404 customizada
+- [x] Otimização de performance (lazy loading, debounce)
 
 ### Documentação Disponível
 
@@ -355,9 +359,11 @@ npm run lighthouse
 2. **TypeScript:** Modo strict, sem `any`
 3. **Componentes:** Um por arquivo, nomes descritivos
 4. **Acessibilidade:** ARIA em todos os componentes interativos
-5. **Semântica:** HTML semântico (header, main, nav, section)
+5. **Semântica:** HTML semântico (header, main, nav, section) — um único `<main>` por página
 6. **Testes:** axe-core em todas as páginas
 7. **IA:** Uso documentado conforme item 13.9 do edital
+8. **Segurança:** Validação Zod em todas as APIs, max-length em inputs, PII não persistido em localStorage
+9. **Performance:** Componentes de mídia com lazy loading (`next/dynamic`), debounce em store updates
 
 ---
 

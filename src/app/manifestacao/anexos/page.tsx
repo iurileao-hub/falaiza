@@ -15,9 +15,6 @@ import { MEDIA_CONFIG, FORMATOS_ACEITOS } from "@/lib/constants";
 import { PreviewAnexo, TipoAnexo } from "@/types/anexo";
 import type { UploadedFile } from "@/hooks/useFileUpload";
 
-const generateId = () =>
-  `anexo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
 const mapUploadedFileToAnexo = (file: UploadedFile): PreviewAnexo => {
   const tipoMap: Record<UploadedFile["type"], TipoAnexo> = {
     image: "foto",

@@ -20,7 +20,7 @@ import type {
 import { classificarPorRegras, classificacaoConfiavel } from './rules-engine';
 
 // ============================================================================
-// Estado Global do Engine
+// Configuração do Engine (sem estado global mutável para compatibilidade SSR)
 // ============================================================================
 
 /** Configuração padrão de IA */
@@ -29,7 +29,13 @@ const configPadrao: ConfiguracaoIA = {
   usarBackendGDF: true,       // Habilitado por padrão
 };
 
-let configAtual: ConfiguracaoIA = { ...configPadrao };
+/**
+ * Retorna uma cópia fresca da configuração atual.
+ * Evita estado global mutável que seria compartilhado entre requests no SSR.
+ */
+function obterConfig(): ConfiguracaoIA {
+  return { ...configPadrao };
+}
 
 // ============================================================================
 // Camada 2: Backend GDF (Mock para demonstração)
@@ -118,10 +124,11 @@ export async function classificar(
   onProgress?.(0.2);
 
   // 2. Se backend GDF disponível e autorizado
+  const config = obterConfig();
   if (
     usarBackendGDF &&
-    configAtual.backendGDFDisponivel &&
-    configAtual.usarBackendGDF &&
+    config.backendGDFDisponivel &&
+    config.usarBackendGDF &&
     typeof navigator !== 'undefined' &&
     navigator.onLine
   ) {
@@ -174,33 +181,45 @@ function mergeResultados(
 // ============================================================================
 
 /**
- * Obtém a configuração atual de IA
+ * Obtém a configuração atual de IA (cópia fresca)
  */
 export function getConfigIA(): ConfiguracaoIA {
-  return { ...configAtual };
+  return obterConfig();
 }
 
 /**
- * Atualiza a configuração de IA
+ * Cria uma nova configuração mesclando com os valores padrão.
+ * Retorna a configuração resultante sem mutar estado global.
  */
-export function setConfigIA(config: Partial<ConfiguracaoIA>): void {
-  configAtual = { ...configAtual, ...config };
+export function criarConfigIA(config: Partial<ConfiguracaoIA>): ConfiguracaoIA {
+  return { ...configPadrao, ...config };
 }
 
 /**
- * Reseta a configuração para o padrão
+ * Atualiza a configuração de IA (mantido por compatibilidade, sem efeito no SSR)
+ * @deprecated Use criarConfigIA() e passe a config como parâmetro
+ */
+export function setConfigIA(_config: Partial<ConfiguracaoIA>): void {
+  // No-op: configuração não é mais global para evitar vazamento entre requests SSR.
+  // Use criarConfigIA() para obter uma configuração customizada.
+}
+
+/**
+ * Reseta a configuração para o padrão (mantido por compatibilidade)
+ * @deprecated Sem efeito, pois não há mais estado global mutável
  */
 export function resetConfigIA(): void {
-  configAtual = { ...configPadrao };
+  // No-op: configuração não é mais global.
 }
 
 /**
- * Retorna qual camada será usada com a configuração atual
+ * Retorna qual camada será usada com a configuração padrão
  */
 export function getCamadaAtiva(): CamadaClassificacao {
+  const config = obterConfig();
   if (
-    configAtual.backendGDFDisponivel &&
-    configAtual.usarBackendGDF &&
+    config.backendGDFDisponivel &&
+    config.usarBackendGDF &&
     typeof navigator !== 'undefined' &&
     navigator.onLine
   ) {

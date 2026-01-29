@@ -41,7 +41,6 @@ export function WizardLayout({
       <main
         id="main-content"
         className="flex-1 py-8"
-        role="main"
         aria-label="Formulário de manifestação"
       >
         <div className="container max-w-3xl">{children}</div>

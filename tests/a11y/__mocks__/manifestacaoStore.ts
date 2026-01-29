@@ -43,19 +43,22 @@ export const mockAnexos = [
 export const mockClassificacao: ClassificacaoResultado = {
   tipo: {
     id: 'reclamacao',
-    nome: 'Reclamacao',
     confianca: 0.85,
   },
   orgao: {
     id: 'saude',
-    nome: 'Secretaria de Saude',
     confianca: 0.78,
   },
-  entidades: [],
+  entidades: {
+    locais: [],
+    datas: [],
+    orgaosMencionados: [],
+  },
+  resumo: '',
   meta: {
+    fonte: 'regras',
+    processadoEm: new Date(),
     tempoProcessamento: 150,
-    camadaUtilizada: 1,
-    modeloVersao: '1.0',
     editadoPeloUsuario: false,
   },
 };

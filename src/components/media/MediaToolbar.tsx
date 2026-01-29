@@ -1,12 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { Mic, Video, Camera, Paperclip, X } from "lucide-react";
+import dynamic from "next/dynamic";
+import { Mic, Video, Camera, Paperclip, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AudioRecorder } from "./AudioRecorder";
-import { VideoRecorder } from "./VideoRecorder";
-import { PhotoCapture } from "./PhotoCapture";
 import { cn } from "@/lib/utils";
+
+// Spinner de carregamento para componentes de mídia
+const MediaLoadingFallback = () => (
+  <div className="flex items-center justify-center p-8" role="status">
+    <Loader2 className="h-6 w-6 animate-spin text-muted" aria-hidden="true" />
+    <span className="sr-only">Carregando componente de mídia...</span>
+  </div>
+);
+
+// Importação dinâmica dos componentes de mídia (usam APIs do navegador como MediaRecorder)
+const AudioRecorder = dynamic(() => import("./AudioRecorder").then((mod) => mod.AudioRecorder), {
+  ssr: false,
+  loading: MediaLoadingFallback,
+});
+
+const VideoRecorder = dynamic(() => import("./VideoRecorder").then((mod) => mod.VideoRecorder), {
+  ssr: false,
+  loading: MediaLoadingFallback,
+});
+
+const PhotoCapture = dynamic(() => import("./PhotoCapture").then((mod) => mod.PhotoCapture), {
+  ssr: false,
+  loading: MediaLoadingFallback,
+});
 
 type MediaMode = "none" | "audio" | "video" | "photo" | "file";
 
