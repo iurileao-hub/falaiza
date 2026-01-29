@@ -563,7 +563,7 @@ Todo código foi revisado e validado pelo autor, sendo de sua responsabilidade e
 | Qualidade do Código | 4,0 | ✅ |
 | Lógica e Funcionamento | 3,0 | ✅ |
 | README | 1,0 | ✅ |
-| Vídeo demonstrativo | 1,0 | ⏳ |
+| Vídeo demonstrativo | 1,0 | ✅ |
 | Clareza e Organização | 1,0 | ✅ |
 
 ---

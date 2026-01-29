@@ -397,7 +397,7 @@ npm run lighthouse
   - Captura de mídia (áudio, vídeo, foto) funcionando
   - Layout responsivo corrigido
 
-- [ ] **Gravar vídeo demonstrativo** (≤7 min)
+- [x] **Gravar vídeo demonstrativo** (≤7 min) ✅
   - Mostrar fluxo completo de manifestação
   - Demonstrar classificação inteligente da IZA
   - Destacar acessibilidade e multicanalidade

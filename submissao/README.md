@@ -59,6 +59,22 @@ open http://localhost:3000
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/01-home.png" alt="Tela inicial da FalaIZA com serviços de Ouvidoria" width="250" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/02-relato.png" alt="Wizard de relato com IZA e barra de mídia" width="250" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/03-classificacao.png" alt="Classificação inteligente da IZA com indicador de confiança" width="250" />
+</p>
+
+<p align="center">
+  <em>Tela inicial · Relato com IZA e multicanalidade · Classificação inteligente automática</em>
+</p>
+
+---
+
 ## Índice
 
 1. [Problema e Solução](#1-problema-e-solução)
@@ -209,7 +225,7 @@ A Camada 1 foi otimizada através de **metodologia de testes iterativos**:
 
 **Metodologia:** Gerar casos de teste → Executar → Analisar erros → Ajustar → Repetir
 
-Ver documentação completa em [RELATORIO_IZA_INTELIGENTE.md](RELATORIO_IZA_INTELIGENTE.md).
+Ver documentação técnica completa em [submissao/RELATORIO_IZA_INTELIGENTE.md](submissao/RELATORIO_IZA_INTELIGENTE.md)
 
 ### 3.3. Regras de Fallback
 
@@ -547,7 +563,7 @@ Todo código foi revisado e validado pelo autor, sendo de sua responsabilidade e
 | Qualidade do Código | 4,0 | ✅ |
 | Lógica e Funcionamento | 3,0 | ✅ |
 | README | 1,0 | ✅ |
-| Vídeo demonstrativo | 1,0 | ⏳ |
+| Vídeo demonstrativo | 1,0 | ✅ |
 | Clareza e Organização | 1,0 | ✅ |
 
 ---
@@ -556,9 +572,9 @@ Todo código foi revisado e validado pelo autor, sendo de sua responsabilidade e
 
 | Documento | Descrição |
 |-----------|-----------|
-| [RESUMO_EXECUTIVO.md](RESUMO_EXECUTIVO.md) | Versão condensada para avaliadores |
-| [RELATORIO_IZA_INTELIGENTE.md](RELATORIO_IZA_INTELIGENTE.md) | Análise técnica do sistema de classificação |
-| [CLAUDE.md](../CLAUDE.md) | Guia para desenvolvimento com IA |
+| [submissao/RESUMO_EXECUTIVO.md](submissao/RESUMO_EXECUTIVO.md) | Versão condensada para avaliadores |
+| [submissao/RELATORIO_IZA_INTELIGENTE.md](submissao/RELATORIO_IZA_INTELIGENTE.md) | Análise técnica do sistema de classificação |
+| [CLAUDE.md](CLAUDE.md) | Guia para desenvolvimento com IA |
 
 ---
 
