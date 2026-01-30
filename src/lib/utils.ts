@@ -259,3 +259,41 @@ export async function compartilhar(dados: {
     return false;
   }
 }
+
+/**
+ * Revoga um blob URL de forma segura, ignorando erros se já foi revogado
+ */
+export function revokeObjectURLSafely(url: string | null | undefined): void {
+  if (url) {
+    try {
+      URL.revokeObjectURL(url);
+    } catch {
+      // Ignorar se já foi revogado
+    }
+  }
+}
+
+/**
+ * Formata tempo em segundos para string MM:SS
+ * Útil para gravação de áudio/vídeo
+ */
+export function formatarTempo(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+}
+
+/**
+ * Mapeia tipo de anexo para tipo de arquivo de upload
+ */
+export function mapTipoAnexoToFileType(
+  tipo: string
+): "image" | "video" | "audio" | "document" {
+  const map: Record<string, "image" | "video" | "audio" | "document"> = {
+    foto: "image",
+    video: "video",
+    audio: "audio",
+    documento: "document",
+  };
+  return map[tipo] || "document";
+}

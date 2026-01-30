@@ -260,7 +260,8 @@ export function useMediaRecorder(
     };
 
     mediaRecorderRef.current = recorder;
-    recorder.start(1000); // Coletar dados a cada segundo
+    const CHUNK_INTERVAL_MS = 1000;
+    recorder.start(CHUNK_INTERVAL_MS);
 
     startTimeRef.current = Date.now();
     setDuration(0);

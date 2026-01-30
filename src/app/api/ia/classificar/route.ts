@@ -20,6 +20,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { classificarPorRegras } from '@/lib/iza/rules-engine';
 import type { TipoManifestacaoId, OrgaoId } from '@/lib/iza/types';
+import { rateLimit } from '@/lib/rate-limit';
 
 interface RequestBody {
   relato: string;
@@ -42,11 +43,32 @@ interface ClassificacaoResponse {
   };
 }
 
-// TODO: Adicionar rate limiting para produção (ex: 60 req/min por IP)
+/**
+ * Rate limiter: 60 requisições por minuto por IP
+ */
+const limiter = rateLimit({
+  interval: 60000, // 1 minuto
+  maxRequests: 60,
+});
+
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const inicio = performance.now();
 
   try {
+    // Rate limiting: verificar se IP excedeu o limite
+    const rateLimitResult = limiter.check(request);
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Muitas requisições. Tente novamente em breve.' },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': '60',
+          },
+        }
+      );
+    }
+
     const body: RequestBody = await request.json();
 
     if (!body.relato || typeof body.relato !== 'string') {

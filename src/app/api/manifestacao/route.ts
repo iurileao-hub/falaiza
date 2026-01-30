@@ -9,6 +9,7 @@ import { gerarProtocolo } from "@/lib/protocolo";
 import { PRAZOS_RESPOSTA } from "@/lib/constants";
 import { sleep } from "@/lib/utils";
 import { TipoManifestacao } from "@/types/manifestacao";
+import { rateLimit } from "@/lib/rate-limit";
 
 /**
  * Configuração do Mock API
@@ -41,12 +42,38 @@ function log(message: string, data?: unknown) {
 }
 
 /**
+ * Rate limiter: 30 requisições por minuto por IP
+ */
+const limiter = rateLimit({
+  interval: 60000, // 1 minuto
+  maxRequests: 30,
+});
+
+/**
  * POST /api/manifestacao
  * Recebe e processa uma nova manifestação
  */
-// TODO: Adicionar rate limiting para produção (ex: 30 req/min por IP)
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: verificar se IP excedeu o limite
+    const rateLimitResult = limiter.check(request);
+    if (!rateLimitResult.success) {
+      log("Rate limit excedido");
+      return NextResponse.json(
+        {
+          success: false,
+          erro: "RATE_LIMIT_EXCEEDED",
+          mensagem: "Muitas requisições. Tente novamente em breve.",
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": "60",
+          },
+        }
+      );
+    }
+
     log("Recebendo nova manifestação...");
 
     // Simular delay de rede
@@ -132,7 +159,9 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("[API Mock] Erro interno:", error);
+    if (process.env.NODE_ENV === "development") {
+      console.error("[API Mock] Erro interno:", error);
+    }
 
     return NextResponse.json(
       {

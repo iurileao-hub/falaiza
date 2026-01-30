@@ -2,8 +2,8 @@
 
 import { X, Play, Pause, Film, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useState, useRef } from "react";
+import { cn, formatarTamanhoArquivo, formatarTempo } from "@/lib/utils";
+import React, { useState, useRef } from "react";
 import { PreviewAnexo } from "@/types/anexo";
 
 interface MediaPreviewProps {
@@ -17,19 +17,7 @@ interface MediaPreviewProps {
   className?: string;
 }
 
-const formatDuration = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-};
-
-const formatFileSize = (bytes: number): string => {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-};
-
-export function MediaPreview({
+function MediaPreviewInner({
   anexo,
   onRemove,
   compact = false,
@@ -86,7 +74,7 @@ export function MediaPreview({
         )}
         {!compact && (
           <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs px-2 py-1">
-            {formatFileSize(anexo.tamanho)}
+            {formatarTamanhoArquivo(anexo.tamanho)}
           </div>
         )}
       </div>
@@ -129,8 +117,8 @@ export function MediaPreview({
           <div className="flex-1 min-w-0">
             <p className="font-medium text-sm truncate">{anexo.nome}</p>
             <p className="text-xs text-muted">
-              {anexo.duracao ? formatDuration(anexo.duracao) : ""} •{" "}
-              {formatFileSize(anexo.tamanho)}
+              {anexo.duracao ? formatarTempo(anexo.duracao) : ""} •{" "}
+              {formatarTamanhoArquivo(anexo.tamanho)}
             </p>
           </div>
         )}
@@ -208,8 +196,8 @@ export function MediaPreview({
 
         {!compact && (
           <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs px-2 py-1 flex justify-between">
-            <span>{anexo.duracao ? formatDuration(anexo.duracao) : ""}</span>
-            <span>{formatFileSize(anexo.tamanho)}</span>
+            <span>{anexo.duracao ? formatarTempo(anexo.duracao) : ""}</span>
+            <span>{formatarTamanhoArquivo(anexo.tamanho)}</span>
           </div>
         )}
       </div>
@@ -237,7 +225,7 @@ export function MediaPreview({
       {!compact && (
         <div className="flex-1 min-w-0">
           <p className="font-medium text-sm truncate">{anexo.nome}</p>
-          <p className="text-xs text-muted">{formatFileSize(anexo.tamanho)}</p>
+          <p className="text-xs text-muted">{formatarTamanhoArquivo(anexo.tamanho)}</p>
         </div>
       )}
 
@@ -255,3 +243,5 @@ export function MediaPreview({
     </div>
   );
 }
+
+export const MediaPreview = React.memo(MediaPreviewInner);

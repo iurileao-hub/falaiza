@@ -7,6 +7,10 @@ const withSerwist = require("@serwist/next").default({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Otimização de tree-shaking para pacotes pesados
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
   // Permitir imagens do Participa DF
   images: {
     remotePatterns: [

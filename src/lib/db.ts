@@ -181,10 +181,19 @@ export const manifestacaoHelpers = {
       .filter((m) => m.atualizadoEm < seteDiasAtras)
       .toArray();
 
-    for (const rascunho of rascunhosAntigos) {
-      if (rascunho.id) {
-        await this.excluir(rascunho.id);
-      }
+    const ids = rascunhosAntigos
+      .map((r) => r.id)
+      .filter((id): id is number => id !== undefined);
+
+    if (ids.length > 0) {
+      await db.transaction("rw", [db.manifestacoes, db.anexos], async () => {
+        // Remover anexos em batch
+        for (const id of ids) {
+          await db.anexos.where("manifestacaoId").equals(id).delete();
+        }
+        // Remover manifestações em batch
+        await db.manifestacoes.bulkDelete(ids);
+      });
     }
 
     return rascunhosAntigos.length;

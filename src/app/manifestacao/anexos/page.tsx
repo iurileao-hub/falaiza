@@ -13,6 +13,7 @@ import { useManifestacaoStore } from "@/stores/manifestacaoStore";
 import { MENSAGENS_IZA } from "@/lib/iza-messages";
 import { MEDIA_CONFIG, FORMATOS_ACEITOS } from "@/lib/constants";
 import { PreviewAnexo, TipoAnexo } from "@/types/anexo";
+import { revokeObjectURLSafely, mapTipoAnexoToFileType } from "@/lib/utils";
 import type { UploadedFile } from "@/hooks/useFileUpload";
 
 const mapUploadedFileToAnexo = (file: UploadedFile): PreviewAnexo => {
@@ -77,20 +78,14 @@ export default function AnexosPage() {
   const handleRemoverAnexo = useCallback(
     (id: string) => {
       const anexo = anexos.find((a) => a.id === id);
-      if (anexo?.url) {
-        URL.revokeObjectURL(anexo.url);
-      }
+      revokeObjectURLSafely(anexo?.url);
       removerAnexo(id);
     },
     [anexos, removerAnexo]
   );
 
   const handleLimparTodos = useCallback(() => {
-    anexos.forEach((anexo) => {
-      if (anexo.url) {
-        URL.revokeObjectURL(anexo.url);
-      }
-    });
+    anexos.forEach((anexo) => revokeObjectURLSafely(anexo.url));
     limparAnexos();
   }, [anexos, limparAnexos]);
 
@@ -139,18 +134,13 @@ export default function AnexosPage() {
           id: a.id,
           file: new File([], a.nome),
           url: a.url,
-          type:
-            a.tipo === "foto"
-              ? "image"
-              : a.tipo === "video"
-                ? "video"
-                : a.tipo === "audio"
-                  ? "audio"
-                  : "document",
+          type: mapTipoAnexoToFileType(a.tipo),
           name: a.nome,
           size: a.tamanho,
         }))}
         onFilesChange={handleFilesChange}
+        onRemoveFile={handleRemoverAnexo}
+        showFileList={false}
         accept={[
           ...FORMATOS_ACEITOS.imagens,
           ...FORMATOS_ACEITOS.documentos,

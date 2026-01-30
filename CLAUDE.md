@@ -28,7 +28,9 @@ Este arquivo fornece orientações para o assistente de programação **Claude C
 - [x] Code review de segurança e qualidade ✅
 - [x] Hardening de APIs (validação, max-length, Zod sempre ativo)
 - [x] Error Boundary e página 404 customizada
-- [x] Otimização de performance (lazy loading, debounce)
+- [x] Otimização de performance (lazy loading, debounce, keyword cache)
+- [x] Security headers (CSP, X-Frame-Options) via middleware
+- [x] Rate limiting em APIs (/api/manifestacao, /api/ia/classificar)
 
 ### Documentação Disponível
 
@@ -128,6 +130,7 @@ falaiza/
 │       └── logos/         # Logos GDF, Participa DF
 │
 ├── src/
+│   ├── middleware.ts        # Security headers (CSP, X-Frame-Options)
 │   ├── app/
 │   │   ├── layout.tsx
 │   │   ├── page.tsx
@@ -173,6 +176,8 @@ falaiza/
 │   │   │   ├── keywords.ts        # Regras de palavras-chave (800+)
 │   │   │   └── types.ts           # Tipos TypeScript
 │   │   ├── db.ts          # Dexie.js config
+│   │   ├── rate-limit.ts  # Rate limiter em memória (IP-based)
+│   │   ├── utils.ts       # Utilitários compartilhados
 │   │   ├── protocolo.ts   # Geração de protocolo
 │   │   └── validations.ts # Schemas Zod
 │   │
@@ -362,8 +367,8 @@ npm run lighthouse
 5. **Semântica:** HTML semântico (header, main, nav, section) — um único `<main>` por página
 6. **Testes:** axe-core em todas as páginas
 7. **IA:** Uso documentado conforme item 13.9 do edital
-8. **Segurança:** Validação Zod em todas as APIs, max-length em inputs, PII não persistido em localStorage
-9. **Performance:** Componentes de mídia com lazy loading (`next/dynamic`), debounce em store updates
+8. **Segurança:** Validação Zod em todas as APIs, max-length em inputs, PII não persistido em localStorage, CSP via middleware, rate limiting em APIs
+9. **Performance:** Componentes de mídia com lazy loading (`next/dynamic`), debounce em store updates, cache pré-normalizado de keywords na Camada 1
 
 ---
 

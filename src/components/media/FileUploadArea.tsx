@@ -1,17 +1,21 @@
 "use client";
 
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useState, useMemo, useRef, useEffect } from "react";
 import { Upload, X, File, Image, Film, Music, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFileUpload, type UploadedFile } from "@/hooks/useFileUpload";
 import { MEDIA_CONFIG, FORMATOS_ACEITOS } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn, formatarTamanhoArquivo } from "@/lib/utils";
 
 interface FileUploadAreaProps {
   /** Arquivos já adicionados */
   existingFiles?: UploadedFile[];
   /** Callback quando arquivos são adicionados */
   onFilesChange: (files: UploadedFile[]) => void;
+  /** Callback quando um arquivo existente é removido */
+  onRemoveFile?: (id: string) => void;
+  /** Ocultar lista de arquivos (quando o pai exibe sua própria lista) */
+  showFileList?: boolean;
   /** Tipos aceitos */
   accept?: string[];
   /** Máximo de arquivos */
@@ -19,12 +23,6 @@ interface FileUploadAreaProps {
   /** Classes CSS adicionais */
   className?: string;
 }
-
-const formatFileSize = (bytes: number): string => {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-};
 
 const getFileIcon = (type: UploadedFile["type"]) => {
   switch (type) {
@@ -42,6 +40,8 @@ const getFileIcon = (type: UploadedFile["type"]) => {
 export function FileUploadArea({
   existingFiles = [],
   onFilesChange,
+  onRemoveFile,
+  showFileList = true,
   accept = [
     ...FORMATOS_ACEITOS.imagens,
     ...FORMATOS_ACEITOS.documentos,
@@ -67,27 +67,40 @@ export function FileUploadArea({
     maxFiles,
   });
 
-  // Sincronizar arquivos existentes
-  const allFiles = useMemo(
-    () => [...existingFiles, ...files],
-    [existingFiles, files]
-  );
+  // Mesclar arquivos existentes + novos, deduplicando por ID
+  const allFiles = useMemo(() => {
+    const existingIds = new Set(existingFiles.map((f) => f.id));
+    const newOnly = files.filter((f) => !existingIds.has(f.id));
+    return [...existingFiles, ...newOnly];
+  }, [existingFiles, files]);
 
   // Notificar mudanças
   const handleAddFiles = useCallback(
     (fileList: FileList | File[]) => {
       addFiles(fileList);
-      onFilesChange([...allFiles, ...Array.from(fileList as FileList).map(() => files[files.length - 1]).filter(Boolean)]);
     },
-    [addFiles, allFiles, files, onFilesChange]
+    [addFiles]
   );
+
+  // Notificar mudanças quando files mudam (via useEffect para evitar dados stale)
+  const prevFilesLengthRef = useRef(files.length);
+  useEffect(() => {
+    if (files.length !== prevFilesLengthRef.current) {
+      prevFilesLengthRef.current = files.length;
+      onFilesChange([...existingFiles, ...files]);
+    }
+  }, [files, existingFiles, onFilesChange]);
 
   const handleRemoveFile = useCallback(
     (id: string) => {
+      // Remove do estado local do hook
       removeFile(id);
-      onFilesChange(allFiles.filter((f) => f.id !== id));
+      // Notifica o pai para remover do store (se existir)
+      if (onRemoveFile) {
+        onRemoveFile(id);
+      }
     },
-    [removeFile, allFiles, onFilesChange]
+    [removeFile, onRemoveFile]
   );
 
   // Handlers de drag and drop
@@ -186,7 +199,7 @@ export function FileUploadArea({
             : "Arraste arquivos ou clique para selecionar"}
         </p>
         <p className="text-sm text-muted">
-          Imagens, documentos, áudios e vídeos • Máx. {formatFileSize(MEDIA_CONFIG.totalMaxSize)} total
+          Imagens, documentos, áudios e vídeos • Máx. {formatarTamanhoArquivo(MEDIA_CONFIG.totalMaxSize)} total
         </p>
       </div>
 
@@ -200,75 +213,80 @@ export function FileUploadArea({
         </div>
       )}
 
-      {/* Indicador de tamanho total */}
-      {allFiles.length > 0 && (
-        <div className="flex justify-between text-sm">
-          <span className="text-muted">
-            {allFiles.length} arquivo(s) selecionado(s)
-          </span>
-          <span
-            className={cn(
-              isOverLimit ? "text-error font-medium" : "text-muted"
-            )}
-          >
-            {formatFileSize(totalWithExisting)} /{" "}
-            {formatFileSize(MEDIA_CONFIG.totalMaxSize)}
-          </span>
-        </div>
-      )}
-
-      {/* Lista de arquivos */}
-      {allFiles.length > 0 && (
-        <ul className="space-y-2" aria-label="Arquivos selecionados">
-          {allFiles.map((file) => {
-            const Icon = getFileIcon(file.type);
-
-            return (
-              <li
-                key={file.id}
-                className="flex items-center gap-3 p-3 bg-surface rounded-lg"
-              >
-                {/* Preview ou ícone */}
-                {file.type === "image" && file.url ? (
-                  <img
-                    src={file.url}
-                    alt=""
-                    className="w-12 h-12 object-cover rounded"
-                  />
-                ) : (
-                  <div className="w-12 h-12 flex items-center justify-center bg-muted/10 rounded">
-                    <Icon className="h-6 w-6 text-muted" />
-                  </div>
+      {/* Indicador e lista de arquivos (ocultável quando o pai exibe sua própria lista) */}
+      {showFileList && (
+        <>
+          {/* Indicador de tamanho total */}
+          {allFiles.length > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-muted">
+                {allFiles.length} arquivo(s) selecionado(s)
+              </span>
+              <span
+                className={cn(
+                  isOverLimit ? "text-error font-medium" : "text-muted"
                 )}
+              >
+                {formatarTamanhoArquivo(totalWithExisting)} /{" "}
+                {formatarTamanhoArquivo(MEDIA_CONFIG.totalMaxSize)}
+              </span>
+            </div>
+          )}
 
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{file.name}</p>
-                  <p className="text-sm text-muted">
-                    {formatFileSize(file.size)}
-                  </p>
-                  {file.error && (
-                    <p className="text-sm text-error">{file.error}</p>
-                  )}
-                </div>
+          {/* Lista de arquivos */}
+          {allFiles.length > 0 && (
+            <ul className="space-y-2" aria-label="Arquivos selecionados">
+              {allFiles.map((file) => {
+                const Icon = getFileIcon(file.type);
 
-                {/* Remover */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveFile(file.id);
-                  }}
-                  className="text-muted hover:text-error"
-                  aria-label={`Remover ${file.name}`}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </li>
-            );
-          })}
-        </ul>
+                return (
+                  <li
+                    key={file.id}
+                    className="flex items-center gap-3 p-3 bg-surface rounded-lg"
+                  >
+                    {/* Preview ou ícone */}
+                    {file.type === "image" && file.url ? (
+                      <img
+                        src={file.url}
+                        alt=""
+                        className="w-12 h-12 object-cover rounded"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 flex items-center justify-center bg-muted/10 rounded">
+                        <Icon className="h-6 w-6 text-muted" />
+                      </div>
+                    )}
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{file.name}</p>
+                      <p className="text-sm text-muted">
+                        {formatarTamanhoArquivo(file.size)}
+                      </p>
+                      {file.error && (
+                        <p className="text-sm text-error">{file.error}</p>
+                      )}
+                    </div>
+
+                    {/* Remover */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveFile(file.id);
+                      }}
+                      className="text-muted hover:text-error"
+                      aria-label={`Remover ${file.name}`}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </>
       )}
     </div>
   );

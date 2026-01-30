@@ -117,6 +117,7 @@ open http://localhost:3000
 | Persistência | IndexedDB (Dexie.js) |
 | PWA | Serwist (Service Worker) |
 | IA | Motor de Regras + API Backend |
+| Segurança | CSP, Rate Limiting, Zod |
 
 ---
 
@@ -142,6 +143,7 @@ falaiza/
 │   ├── components/
 │   │   ├── iza/                # Componentes IZA
 │   │   └── accessibility/      # Painel A11y
+│   ├── middleware.ts            # Security headers (CSP)
 │   └── lib/iza/                # Motor de classificação
 ├── docs/                       # Documentação técnica
 ├── scripts/                    # Scripts de teste

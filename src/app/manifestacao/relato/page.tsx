@@ -13,8 +13,9 @@ import { MediaPreview } from "@/components/media/MediaPreview";
 import { useManifestacaoStore } from "@/stores/manifestacaoStore";
 import { MENSAGENS_IZA } from "@/lib/iza-messages";
 import { VALIDACOES, MEDIA_CONFIG } from "@/lib/constants";
-import { cn, gerarId } from "@/lib/utils";
-import { PreviewAnexo, TipoAnexo } from "@/types/anexo";
+import { cn, gerarId, revokeObjectURLSafely } from "@/lib/utils";
+import { PreviewAnexo } from "@/types/anexo";
+import type { TipoAnexo } from "@/types/anexo";
 
 export default function RelatoPage() {
   const router = useRouter();
@@ -92,7 +93,7 @@ export default function RelatoPage() {
       const anexo: PreviewAnexo = {
         id: gerarId(),
         nome: `audio-${Date.now()}.webm`,
-        tipo: "audio" as TipoAnexo,
+        tipo: "audio" satisfies TipoAnexo,
         tamanho: blob.size,
         url: URL.createObjectURL(blob),
         duracao: duration,
@@ -108,7 +109,7 @@ export default function RelatoPage() {
       const anexo: PreviewAnexo = {
         id: gerarId(),
         nome: `video-${Date.now()}.webm`,
-        tipo: "video" as TipoAnexo,
+        tipo: "video" satisfies TipoAnexo,
         tamanho: blob.size,
         url: URL.createObjectURL(blob),
         duracao: duration,
@@ -124,7 +125,7 @@ export default function RelatoPage() {
       const anexo: PreviewAnexo = {
         id: gerarId(),
         nome: `foto-${Date.now()}.jpg`,
-        tipo: "foto" as TipoAnexo,
+        tipo: "foto" satisfies TipoAnexo,
         tamanho: blob.size,
         url: URL.createObjectURL(blob),
         gravadoNativo: true,
@@ -171,9 +172,7 @@ export default function RelatoPage() {
   const handleRemoverAnexo = useCallback(
     (id: string) => {
       const anexo = anexos.find((a) => a.id === id);
-      if (anexo?.url) {
-        URL.revokeObjectURL(anexo.url);
-      }
+      revokeObjectURLSafely(anexo?.url);
       removerAnexo(id);
     },
     [anexos, removerAnexo]

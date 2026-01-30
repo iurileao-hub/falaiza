@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useMediaRecorder } from "@/hooks/useMediaRecorder";
 import { MEDIA_CONFIG } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn, formatarTempo } from "@/lib/utils";
 
 interface VideoRecorderProps {
   /** Callback quando vídeo é gravado */
@@ -24,12 +24,6 @@ interface VideoRecorderProps {
   /** Classes CSS adicionais */
   className?: string;
 }
-
-const formatTime = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-};
 
 export function VideoRecorder({
   onRecorded,
@@ -86,10 +80,10 @@ export function VideoRecorder({
     checkCameras();
   }, []);
 
-  // Preparar ao montar
+  // Preparar ao montar - executar apenas uma vez, não ao alterar prepare
   useEffect(() => {
     prepare();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- prepare apenas no mount
   }, []);
 
   // Conectar stream ao preview
@@ -119,7 +113,7 @@ export function VideoRecorder({
     if (status === "idle") {
       prepare();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-preparar ao trocar câmera
   }, [facingMode]);
 
   // Confirmar gravação
@@ -198,7 +192,7 @@ export function VideoRecorder({
       <div className={cn("p-4 space-y-4", className)}>
         <div className="text-center">
           <p className="font-medium mb-2">Gravação concluída</p>
-          <p className="text-sm text-muted">Duração: {formatTime(duration)}</p>
+          <p className="text-sm text-muted">Duração: {formatarTempo(duration)}</p>
         </div>
 
         {/* Player de vídeo */}
@@ -255,7 +249,7 @@ export function VideoRecorder({
           <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/50 px-3 py-1 rounded-full">
             <span className="w-3 h-3 bg-error rounded-full animate-pulse" />
             <span className="text-white text-sm font-mono">
-              {formatTime(duration)}
+              {formatarTempo(duration)}
             </span>
           </div>
         )}
@@ -292,7 +286,7 @@ export function VideoRecorder({
               {status === "paused" ? "Pausado" : "Gravando..."}
             </span>
             <span className="text-muted">
-              Restam {formatTime(remainingTime)}
+              Restam {formatarTempo(remainingTime)}
             </span>
           </div>
           <div
@@ -389,7 +383,7 @@ export function VideoRecorder({
       {/* Dica */}
       <p className="text-xs text-center text-muted">
         {status === "ready" &&
-          `Máximo de ${formatTime(maxDuration)}. Clique para iniciar.`}
+          `Máximo de ${formatarTempo(maxDuration)}. Clique para iniciar.`}
         {status === "recording" && "Gravando... Fique estável para melhor qualidade."}
         {status === "paused" && "Gravação pausada. Continue ou finalize."}
       </p>

@@ -163,7 +163,10 @@ export function IzaSugestaoInteligente({ className }: IzaSugestaoInteligenteProp
     [resultadoAtual, atualizarClassificacao]
   );
 
-  const mensagemIza = montarMensagemIza(resultadoAtual, status);
+  const mensagemIza = useMemo(
+    () => montarMensagemIza(resultadoAtual, status),
+    [resultadoAtual, status]
+  );
 
   return (
     <div className={cn('space-y-6', className)}>

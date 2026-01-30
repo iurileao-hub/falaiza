@@ -11,6 +11,7 @@ import {
 } from "@/types/manifestacao";
 import { PreviewAnexo } from "@/types/anexo";
 import { TOTAL_ETAPAS, TIPOS_MANIFESTACAO } from "@/lib/constants";
+import { revokeObjectURLSafely } from "@/lib/utils";
 import type { ClassificacaoResultado } from "@/lib/iza";
 
 interface ManifestacaoState {
@@ -297,13 +298,7 @@ export const useManifestacaoStore = create<ManifestacaoState>()(
         // Importante no mobile onde blobs de áudio/vídeo podem travar o browser
         const anexosAtuais = get().anexos;
         for (const anexo of anexosAtuais) {
-          if (anexo.url) {
-            try {
-              URL.revokeObjectURL(anexo.url);
-            } catch {
-              // Ignorar se já foi revogado
-            }
-          }
+          revokeObjectURLSafely(anexo.url);
         }
 
         // Limpar localStorage para remover PII persistido

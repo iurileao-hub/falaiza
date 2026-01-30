@@ -125,7 +125,9 @@ export default function ConfirmacaoPage() {
       setProtocoloLocal(data.protocolo);
       setSubmitStatus("success");
     } catch (error) {
-      console.error("Erro ao enviar:", error);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Erro ao enviar:", error);
+      }
       setErrorMessage(
         error instanceof Error ? error.message : "Erro desconhecido"
       );

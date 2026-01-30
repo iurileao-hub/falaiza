@@ -5,7 +5,7 @@ import { Mic, MicOff, Square, Pause, Play, Trash2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMediaRecorder } from "@/hooks/useMediaRecorder";
 import { MEDIA_CONFIG } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn, formatarTempo } from "@/lib/utils";
 
 interface AudioRecorderProps {
   /** Callback quando áudio é gravado */
@@ -15,12 +15,6 @@ interface AudioRecorderProps {
   /** Classes CSS adicionais */
   className?: string;
 }
-
-const formatTime = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-};
 
 export function AudioRecorder({
   onRecorded,
@@ -52,10 +46,10 @@ export function AudioRecorder({
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Preparar ao montar
+  // Preparar ao montar - executar apenas uma vez, não ao alterar prepare
   useEffect(() => {
     prepare();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- prepare apenas no mount
   }, []);
 
   // Confirmar gravação
@@ -134,7 +128,7 @@ export function AudioRecorder({
       <div className={cn("p-6 space-y-4", className)}>
         <div className="text-center">
           <p className="font-medium mb-2">Gravação concluída</p>
-          <p className="text-sm text-muted">Duração: {formatTime(duration)}</p>
+          <p className="text-sm text-muted">Duração: {formatarTempo(duration)}</p>
         </div>
 
         {/* Player de áudio */}
@@ -202,11 +196,11 @@ export function AudioRecorder({
               status === "recording" && "text-error font-bold"
             )}
           >
-            {formatTime(duration)}
+            {formatarTempo(duration)}
           </span>
           <span className="text-muted">
-            {status === "recording" && `Restam ${formatTime(remainingTime)}`}
-            {status === "ready" && `Máximo: ${formatTime(maxDuration)}`}
+            {status === "recording" && `Restam ${formatarTempo(remainingTime)}`}
+            {status === "ready" && `Máximo: ${formatarTempo(maxDuration)}`}
             {status === "paused" && "Pausado"}
           </span>
         </div>

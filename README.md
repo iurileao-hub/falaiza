@@ -85,11 +85,12 @@ open http://localhost:3000
 6. [Estrutura do Projeto](#6-estrutura-do-projeto)
 7. [Acessibilidade](#7-acessibilidade)
 8. [PWA e Funcionamento Offline](#8-pwa-e-funcionamento-offline)
-9. [API](#9-api)
-10. [Uso de Inteligência Artificial](#10-uso-de-inteligência-artificial)
-11. [Critérios de Avaliação](#11-critérios-de-avaliação)
-12. [Documentação Adicional](#12-documentação-adicional)
-13. [Licença](#13-licença)
+9. [Segurança](#9-segurança)
+10. [API](#10-api)
+11. [Uso de Inteligência Artificial](#11-uso-de-inteligência-artificial)
+12. [Critérios de Avaliação](#12-critérios-de-avaliação)
+13. [Documentação Adicional](#13-documentação-adicional)
+14. [Licença](#14-licença)
 
 ---
 
@@ -372,6 +373,7 @@ falaiza/
 │   └── manifest.json             # Manifest PWA
 │
 ├── src/
+│   ├── middleware.ts              # Security headers (CSP, X-Frame-Options)
 │   ├── app/                      # Next.js App Router
 │   │   ├── layout.tsx
 │   │   ├── page.tsx              # Home
@@ -400,6 +402,8 @@ falaiza/
 │   ├── lib/
 │   │   ├── iza/                  # Motor de classificação
 │   │   ├── db.ts                 # Dexie config
+│   │   ├── rate-limit.ts         # Rate limiter (IP-based)
+│   │   ├── utils.ts              # Utilitários compartilhados
 │   │   └── validations.ts        # Schemas Zod
 │   │
 │   ├── stores/                   # Zustand
@@ -473,9 +477,22 @@ falaiza/
 
 ---
 
-## 9. API
+## 9. Segurança
 
-### 9.1. POST /api/manifestacao
+| Medida | Implementação |
+|--------|---------------|
+| **Content Security Policy** | Middleware Next.js com CSP restritivo |
+| **Security Headers** | X-Frame-Options, X-Content-Type-Options, Referrer-Policy |
+| **Rate Limiting** | Limitação por IP nas APIs (30-60 req/min) |
+| **Validação** | Zod em todas as rotas de API |
+| **Max-length** | Limite de caracteres em todos os inputs |
+| **PII** | Dados sensíveis não persistidos em localStorage |
+
+---
+
+## 10. API
+
+### 10.1. POST /api/manifestacao
 
 Envio de manifestações.
 
@@ -498,7 +515,7 @@ Envio de manifestações.
 }
 ```
 
-### 9.2. POST /api/ia/classificar
+### 10.2. POST /api/ia/classificar
 
 Classificação via Camada 2 (Mock).
 
@@ -516,22 +533,22 @@ Classificação via Camada 2 (Mock).
 
 ---
 
-## 10. Uso de Inteligência Artificial
+## 11. Uso de Inteligência Artificial
 
 Conforme item 13.9 do Edital nº 10/2025:
 
-### 10.1. Ferramenta de Desenvolvimento
+### 11.1. Ferramenta de Desenvolvimento
 
 - **Claude Code** (Anthropic) — Assistente de programação
 
-### 10.2. Modelos de IA no Sistema
+### 11.2. Modelos de IA no Sistema
 
 | Componente | Tecnologia | Descrição |
 |------------|------------|-----------|
 | Camada 1 | Motor de Regras | 800+ keywords, extração de entidades |
 | Camada 2 (Mock) | API REST | Preparado para BERTimbau |
 
-### 10.3. Atividades Assistidas por IA
+### 11.3. Atividades Assistidas por IA
 
 - Arquitetura do sistema de classificação
 - Implementação de componentes React
@@ -539,13 +556,13 @@ Conforme item 13.9 do Edital nº 10/2025:
 - Documentação técnica
 - Testes e debugging
 
-### 10.4. Responsabilidade
+### 11.4. Responsabilidade
 
 Todo código foi revisado e validado pelo autor, sendo de sua responsabilidade exclusiva.
 
 ---
 
-## 11. Critérios de Avaliação
+## 12. Critérios de Avaliação
 
 ### P1: Critérios de Entrega (10 pontos)
 
@@ -568,7 +585,7 @@ Todo código foi revisado e validado pelo autor, sendo de sua responsabilidade e
 
 ---
 
-## 12. Documentação Adicional
+## 13. Documentação Adicional
 
 | Documento | Descrição |
 |-----------|-----------|
@@ -578,7 +595,7 @@ Todo código foi revisado e validado pelo autor, sendo de sua responsabilidade e
 
 ---
 
-## 13. Licença
+## 14. Licença
 
 Projeto desenvolvido para o **1º Hackathon em Controle Social: Desafio Participa DF**.
 
